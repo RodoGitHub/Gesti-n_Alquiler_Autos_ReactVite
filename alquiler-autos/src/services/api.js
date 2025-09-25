@@ -35,7 +35,13 @@ export const resource = (basePath, label = "Recurso") => ({
         message: r.data?.message ?? `${label}s obtenidos`,
         headers: r.headers
     })),
-    get: (id, config) => api.get(`${basePath}/${id}`, config).then((r) => ({
+    get: (config) => api.get(basePath, config).then((r) => ({
+        data: r.data,
+        status: r.status,
+        message: r.data?.message ?? `${label} obtenido`,
+        headers: r.headers
+    })),
+    getByID: (id, config) => api.get(`${basePath}/${id}`, config).then((r) => ({
         data: r.data,
         status: r.status,
         message: r.data?.message ?? `${label} obtenido`,

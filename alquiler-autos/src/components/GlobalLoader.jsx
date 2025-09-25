@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { onLoadingChange } from "./loading-bus";
+import { onLoadingChange } from "../core/loading-bus";
 import { ProgressSpinner } from "primereact/progressspinner";
 
 export default function GlobalLoader() {
