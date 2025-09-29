@@ -1,16 +1,15 @@
 import { useState } from 'react';
 
-export default function RegisterForm() {
-    const [name, setName] = useState('');
+export default function LoginForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await fetch('http://localhost:5000/api/register', {
+        const response = await fetch('http://localhost:5000/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ email, password }),
         });
         const data = await response.json();
         console.log(data);
@@ -18,14 +17,7 @@ export default function RegisterForm() {
 
     return (
         <form onSubmit={handleSubmit}>
-        <h2>Registrarse</h2>
-        <input
-            type="text"
-            placeholder="Nombre"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-        />
+        <h2>Iniciar Sesión</h2>
         <input
             type="email"
             placeholder="Email"
@@ -40,7 +32,7 @@ export default function RegisterForm() {
             onChange={(e) => setPassword(e.target.value)}
             required
         />
-        <button type="submit">Registrarse</button>
+        <button type="submit">Ingresar</button>
         </form>
     );
 }

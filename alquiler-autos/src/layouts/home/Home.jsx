@@ -3,39 +3,37 @@ import { Link } from 'react-router-dom';
 import { Button } from 'primereact/button'; 
 import { AuthContext } from '../../context/AuthContext';
 
-  const HomeView = () => {
-    const {user, logout} = useContext(AuthContext)
-    
-    return (
-      <div style={{ textAlign: 'center', padding: '20px' }}>
-        <h1>Bienvenido - Alquiler de autos</h1>
-        
-        {user ?
-            <div>
-                <Link to="/usuarios">
-                    <Button label="Ir a Usuarios" />
-                </Link>
+const HomeView = () => {
+  const { user, logout } = useContext(AuthContext);
 
-                <Link to="/productos">
-                    <Button label="Ir a Productos" />
-                </Link>
+  return (
+    <div style={{ textAlign: 'center', padding: '20px' }}>
+      <h1>Bienvenido - Alquiler de autos</h1>
+      
+      {user ? (
+        <div>
+          <Link to="/usuarios">
+            <Button label="Ir a Usuarios" />
+          </Link>
 
-                <Button label='Cerrar Sesión' onClick={logout}/>
-            </div>
-        : 
-            <div>
-                <Link to='/inicio-sesion'>
-                    <Button label='Iniciar sesión'/>
-                </Link>
-                <Link to='/registro'>
-                    <Button label='Registrarse'/>
-                </Link>
-          </div>
+          <Link to="/productos">
+            <Button label="Ir a Productos" />
+          </Link>
 
-        }
-        
-      </div>
-    );
-  };
+          <Button label="Cerrar Sesión" onClick={logout}/>
+        </div>
+      ) : (
+        <div>
+          <Link to='/auth/login'>
+            <Button label='Iniciar sesión'/>
+          </Link>
+          <Link to='/auth/register'>
+            <Button label='Registrarse'/>
+          </Link>
+        </div>
+      )}
+    </div>
+  );
+};
 
-  export default HomeView;
+export default HomeView;
