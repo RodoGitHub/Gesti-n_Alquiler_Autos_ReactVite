@@ -5,7 +5,7 @@ import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Divider } from "primereact/divider";
-import "../../App.css"; // ajustá según tu ruta
+import "../../App.css"; 
 
 export default function LoginForm() {
     const [email, setEmail] = useState("");

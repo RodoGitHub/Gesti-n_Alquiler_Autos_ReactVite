@@ -4,7 +4,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
-import UserForm from "./UserForm"; // tu componente existente
+import UserForm from "./UserForm";
 
 const UsersView = () => {
     const [users, setUsers] = useState([]);
