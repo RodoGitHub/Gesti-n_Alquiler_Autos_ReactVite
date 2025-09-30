@@ -40,3 +40,120 @@
 .read-the-docs {
   color: #888;
 }
+/* Contenedor principal */
+.home-container {
+  height: 100vh;
+  width: 100vw;
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Card principal */
+.home-card {
+  height: 100%;
+  width: 100%;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* Contenedor de botones */
+.home-buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  height: 100%;
+  gap: 2rem;
+}
+
+/* Links de los botones */
+.home-buttons a {
+  width: 100%;
+}
+
+/* Botones */
+.home-buttons .p-button {
+  width: 100%;
+  font-size: 1.2rem;
+}
+.login-container {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f2f5;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+}
+
+.login-form .p-field {
+  margin-bottom: 1.5rem;
+}
+
+.login-form label {
+  font-weight: bold;
+}
+
+.login-form .p-button {
+  width: 100%;
+}
+.full-width {
+  width: 100%;
+}
+/* Navbar */
+.navbar {
+  background-color: #1976d2;
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.navbar-title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.navbar-buttons .p-button {
+  min-width: 120px;
+}
+
+
+@media (max-width: 600px) {
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+  .navbar-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .navbar-buttons .p-button {
+    width: 100%;
+  }
+}
+.navbar-buttons {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #1976d2;
+  color: #fff;
+}
+.navbar-buttons .p-button {
+  height: 2.5rem;
+}

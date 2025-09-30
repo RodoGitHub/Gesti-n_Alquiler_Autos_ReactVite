@@ -2,11 +2,11 @@ import { Routes, Route } from "react-router-dom";
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 
-const AuthRoutes = () => {
+const AuthRoutes = ({ toast }) => {
     return (
         <Routes>
-        <Route path="login" element={<LoginForm />} />
-        <Route path="register" element={<RegisterForm />} />
+            <Route path="/login" element={<LoginForm toast={toast} />} />
+            <Route path="/register" element={<RegisterForm toast={toast} />} />
         </Routes>
     );
 };
