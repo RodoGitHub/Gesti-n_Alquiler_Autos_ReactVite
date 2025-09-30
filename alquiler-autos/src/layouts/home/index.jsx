@@ -1,9 +1,23 @@
-import HomeView from "./Home"
+// src/layouts/home/index.jsx
+import { Outlet, Link } from "react-router-dom";
+import { Menubar } from "primereact/menubar";
 
-const Home = () => {
+const DashboardLayout = () => {
+    const items = [
+        { label: "Inicio", icon: "pi pi-home", url: "/" },
+        { label: "Usuarios", icon: "pi pi-users", url: "/usuarios" },
+        { label: "Productos", icon: "pi pi-box", url: "/productos" },
+    ];
+
     return (
-        <HomeView />
-    )
-}
+        <div className="min-h-screen flex flex-column">
+        <Menubar model={items} />
+        <div className="p-4">
+            {/* Aquí se cargan las páginas hijas */}
+            <Outlet />
+        </div>
+        </div>
+    );
+};
 
-export default Home
+export default DashboardLayout;
