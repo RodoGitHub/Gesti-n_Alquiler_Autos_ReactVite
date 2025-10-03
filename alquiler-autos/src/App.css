@@ -1,159 +1,139 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-/* Contenedor principal */
-.home-container {
-  height: 100vh;
-  width: 100vw;
-  background-color: #f5f5f5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* Card principal */
-.home-card {
-  height: 100%;
+html, body, #root {
+  margin: 0;
+  padding: 0;
   width: 100%;
-  padding: 2rem;
+  height: 100%;
+  font-family: Arial, sans-serif;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
-/* Contenedor de botones */
-.home-buttons {
+.auth-hero {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  background: linear-gradient(to right, #0D3B66 50%, #F5F5F5 50%);
+}
+
+.auth-hero-left {
+  flex: 1;
+  min-width: 300px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: stretch;
-  height: 100%;
-  gap: 2rem;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  color: white;
 }
 
-/* Links de los botones */
-.home-buttons a {
-  width: 100%;
+.auth-hero-left h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 0.5rem;
 }
 
-/* Botones */
-.home-buttons .p-button {
-  width: 100%;
+.auth-hero-left h2 {
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: #A0C4FF;
+  margin-bottom: 1rem;
+}
+
+.auth-hero-left p {
   font-size: 1.2rem;
+  color: #DADADA;
 }
-.login-container {
-  height: 100vh;
-  width: 100vw;
+
+.auth-hero-right {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f0f2f5;
-}
-
-.login-card {
-  width: 100%;
-  max-width: 400px;
   padding: 2rem;
 }
 
-.login-form .p-field {
-  margin-bottom: 1.5rem;
+.auth-card {
+  max-width: 400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  transition: transform 0.3s;
+  background-color: white;
 }
 
-.login-form label {
+.auth-card:hover {
+  transform: translateY(-5px);
+}
+
+.p-inputtext, .p-password input {
+  border-radius: 8px;
+  border: 1px solid #B0B0B0;
+  padding: 0.8rem;
+  transition: border 0.3s;
+}
+
+.p-inputtext:focus, .p-password input:focus {
+  border: 2px solid #FF6B35;
+  outline: none;
+}
+
+.p-button {
+  border-radius: 50px;
   font-weight: bold;
+  padding: 0.8rem 1.5rem;
+  transition: background 0.3s;
 }
 
-.login-form .p-button {
-  width: 100%;
-}
-.full-width {
-  width: 100%;
-}
-/* Navbar */
-.navbar {
-  background-color: #1976d2;
-  color: #fff;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+.p-button-primary {
+  background: #FF6B35;
+  border: none;
+  color: white;
 }
 
-.navbar-title {
-  margin: 0;
-  font-size: 1.5rem;
+.p-button-primary:hover {
+  background: #FFC300;
+  color: #0D3B66;
 }
 
-.navbar-buttons .p-button {
-  min-width: 120px;
+.p-button-text {
+  color: #007AD9;
 }
 
+.p-toast-message-success {
+  background-color: #27AE60 !important;
+  color: white !important;
+}
 
-@media (max-width: 600px) {
-  .navbar {
+.p-toast-message-error {
+  background-color: #E74C3C !important;
+  color: white !important;
+}
+
+@media (max-width: 768px) {
+  .auth-hero {
     flex-direction: column;
-    align-items: stretch;
-    gap: 0.5rem;
+    background: #0D3B66;
   }
-  .navbar-buttons {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .navbar-buttons .p-button {
+
+  .auth-hero-left, .auth-hero-right {
+    flex: none;
     width: 100%;
+    height: 50vh;
   }
-}
-.navbar-buttons {
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background-color: #1976d2;
-  color: #fff;
-}
-.navbar-buttons .p-button {
-  height: 2.5rem;
+
+  .auth-hero-left h1 {
+    font-size: 2.5rem;
+  }
+
+  .auth-hero-left h2 {
+    font-size: 1.5rem;
+  }
+
+  .auth-hero-left p {
+    font-size: 1rem;
+  }
 }
