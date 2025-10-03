@@ -31,8 +31,8 @@ export default function LoginForm() {
         }
 
         const url = isLogin 
-            ? "http://localhost:3000/register/login" 
-            : "http://localhost:3000/register/register";
+            ? "http://localhost:3000/auth/login" 
+            : "http://localhost:3000/auth/register";
 
         const body = isLogin 
             ? { correo: email, password } 
