@@ -16,46 +16,44 @@ export default function LoginForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log({ correo: email, password });
 
         try {
-        const response = await fetch("http://localhost:3000/register/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                correo:email, 
-                password 
-            }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-            toast.current.show({
-            severity: "success",
-            summary: "Éxito",
-            detail: "Login exitoso!",
-            life: 3000,
+            const response = await fetch("http://localhost:3000/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({correo: email, password })
             });
-            if (data.token) localStorage.setItem("token", data.token);
-            setEmail("");
-            setPassword("");
-            navigate("/");
-        } else {
-            toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: data.message || "Credenciales incorrectas",
-            life: 3000,
-            });
-        }
+
+            const data = await response.json();
+
+            if (response.ok) {
+                toast.current.show({
+                    severity: "success",
+                    summary: "Éxito",
+                    detail: "Login exitoso!",
+                    life: 3000,
+                });
+                if (data.token) localStorage.setItem("token", data.token);
+                setEmail("");
+                setPassword("");
+                navigate("/");
+            } else {
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: data.message || "Credenciales incorrectas",
+                    life: 3000,
+                });
+            }
         } catch (error) {
-        toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: "Error de conexión con el servidor",
-            life: 3000,
-        });
-        console.error(error);
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Error de conexión con el servidor",
+                life: 3000,
+            });
+            console.error(error);
         }
     };
 
