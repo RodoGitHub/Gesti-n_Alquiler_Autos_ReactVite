@@ -6,25 +6,31 @@ import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Divider } from "primereact/divider";
-import "../../App.css"; 
+import "../../App.css";
 
 export default function LoginForm() {
+    const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [name, setName] = useState("");
     const toast = useRef(null);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const url = isLogin 
+        ? "http://localhost:3000/register/login" 
+        : "http://localhost:3000/register/register";
+
+        const body = isLogin 
+        ? { correo: email, password } 
+        : { nombre: name, correo: email, password };
 
         try {
-        const response = await fetch("http://localhost:3000/register/login", {
+        const response = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                correo:email, 
-                password 
-            }),
+            body: JSON.stringify(body),
         });
 
         const data = await response.json();
@@ -33,18 +39,20 @@ export default function LoginForm() {
             toast.current.show({
             severity: "success",
             summary: "Éxito",
-            detail: "Login exitoso!",
+            detail: isLogin ? "Login exitoso!" : "Registro exitoso!",
             life: 3000,
             });
+
             if (data.token) localStorage.setItem("token", data.token);
             setEmail("");
             setPassword("");
+            setName("");
             navigate("/");
         } else {
             toast.current.show({
             severity: "error",
             summary: "Error",
-            detail: data.message || "Credenciales incorrectas",
+            detail: data.message || "Ocurrió un error",
             life: 3000,
             });
         }
@@ -59,91 +67,83 @@ export default function LoginForm() {
         }
     };
 
-    const handleRegisterRedirect = () => {
-        navigate("/register"); 
-    };
-
     return (
-        <div 
-            className="flex justify-content-center align-items-center bg-gray-100"
-            style={{ 
-                height: "100vh", 
-                width: "100vw",
-                padding: "1rem",
-                boxSizing: "border-box"
-            }}
-        >
+        <div className="auth-hero">
+        {/* Lado izquierdo */}
+        <div className="auth-hero-left">
+            Bienvenido a <br /> Mi Plataforma
+        </div>
+
+        {/* Lado derecho: formulario */}
+        <div className="auth-hero-right">
             <Toast ref={toast} />
             <Card 
-                title="Iniciar Sesión" 
-                className="shadow-5 border-round-lg"
-                style={{ 
-                    width: "100%", 
-                    maxWidth: "450px",
-                    minHeight: "500px",
-                    padding: "2rem"
-                }}
+            title={isLogin ? "Iniciar Sesión" : "Crear Cuenta"} 
+            className="auth-card"
             >
-                <form onSubmit={handleSubmit} className="flex flex-column gap-4">
-                    <div className="field">
-                        <label htmlFor="email" className="block text-lg font-medium mb-2">
-                            Email
-                        </label>
-                        <InputText
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="ejemplo@correo.com"
-                            required
-                            className="w-full"
-                            size="large"
-                        />
-                    </div>
-
-                    <div className="field">
-                        <label htmlFor="password" className="block text-lg font-medium mb-2">
-                            Contraseña
-                        </label>
-                        
-                        <div className="p-password p-component p-inputwrapper w-full">
-                            <Password
-                                id="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                toggleMask
-                                feedback={false}
-                                placeholder="Contraseña"
-                                required
-                                className="w-full"
-                                inputClassName="w-full"
-                                size="large"
-                            />
-                        </div>
-                    </div>
-
-                    <Button
-                        type="submit"
-                        label="Ingresar"
-                        icon="pi pi-sign-in"
-                        className="p-button-rounded p-button-primary w-full mt-3"
-                        size="large"
-                    />
-                </form>
-
-                <Divider className="my-4" />
-
-                <div className="text-center">
-                    <p className="text-lg mb-2">
-                        ¿No tenés cuenta?
-                    </p>
-                    <Button
-                        label="Registrarse"
-                        className="p-button-text p-button-lg"
-                        onClick={handleRegisterRedirect}
+            <form onSubmit={handleSubmit} className="login-form flex flex-column gap-4">
+                {!isLogin && (
+                <div className="p-field">
+                    <label htmlFor="name">Nombre completo</label>
+                    <InputText
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Tu nombre"
+                    required
+                    className="full-width"
                     />
                 </div>
+                )}
+
+                <div className="p-field">
+                <label htmlFor="email">Email</label>
+                <InputText
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="ejemplo@correo.com"
+                    required
+                    className="full-width"
+                />
+                </div>
+
+                <div className="p-field">
+                <label htmlFor="password">Contraseña</label>
+                <Password
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    toggleMask
+                    feedback={false}
+                    placeholder="Contraseña"
+                    required
+                    className="full-width"
+                    inputClassName="full-width"
+                />
+                </div>
+
+                <Button
+                type="submit"
+                label={isLogin ? "Ingresar" : "Registrarse"}
+                icon={isLogin ? "pi pi-sign-in" : "pi pi-user-plus"}
+                className="p-button-primary p-button-rounded full-width"
+                />
+            </form>
+
+            <Divider className="my-4" />
+
+            <div className="text-center">
+                <p>{isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}</p>
+                <Button
+                label={isLogin ? "Registrarse" : "Iniciar Sesión"}
+                className="p-button-text"
+                onClick={() => setIsLogin(!isLogin)}
+                />
+            </div>
             </Card>
+        </div>
         </div>
     );
 }
