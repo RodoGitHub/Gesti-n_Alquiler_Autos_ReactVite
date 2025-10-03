@@ -18,6 +18,7 @@ export default function LoginForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+<<<<<<< HEAD
         const url = isLogin 
         ? "http://localhost:3000/register/login" 
         : "http://localhost:3000/register/register";
@@ -56,14 +57,47 @@ export default function LoginForm() {
             life: 3000,
             });
         }
+=======
+        console.log({ correo: email, password });
+
+        try {
+            const response = await fetch("http://localhost:3000/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    orreo: email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                toast.current.show({
+                    severity: "success",
+                    summary: "Éxito",
+                    detail: "Login exitoso!",
+                    life: 3000,
+                });
+                if (data.token) localStorage.setItem("token", data.token);
+                setEmail("");
+                setPassword("");
+                navigate("/");
+            } else {
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: data.message || "Credenciales incorrectas",
+                    life: 3000,
+                });
+            }
+>>>>>>> 25bbe8a995e9ad89352a53e78463974f046d13c9
         } catch (error) {
-        toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: "Error de conexión con el servidor",
-            life: 3000,
-        });
-        console.error(error);
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Error de conexión con el servidor",
+                life: 3000,
+            });
+            console.error(error);
         }
     };
 
