@@ -6,6 +6,7 @@ import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Divider } from "primereact/divider";
+import { useAuth } from "../../context/AuthContext"; 
 import "../../App.css";
 
 export default function LoginForm() {
@@ -16,6 +17,7 @@ export default function LoginForm() {
     const [name, setName] = useState("");
     const toast = useRef(null);
     const navigate = useNavigate();
+    const { signIn } = useAuth(); // ✅ usamos el contexto correctamente
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,59 +27,73 @@ export default function LoginForm() {
                 severity: "warn",
                 summary: "Advertencia",
                 detail: "Las contraseñas no coinciden",
-                life:1500,
+                life: 1500,
             });
             return;
         }
 
-        const url = isLogin 
-            ? "http://localhost:3000/auth/login" 
-            : "http://localhost:3000/auth/register";
-
-        const body = isLogin 
-            ? { correo: email, password } 
-            : { nombre: name, correo: email, password };
-
-        try {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(body),
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
+        if (isLogin) {
+            // 🔹 Login usando el contexto
+            try {
+                await signIn({ correo: email, password });
                 toast.current.show({
                     severity: "success",
                     summary: "Éxito",
-                    detail: isLogin ? "Login exitoso!" : "Registro exitoso!",
-                    life: 3000,
+                    detail: "Login exitoso!",
+                    life: 1500,
                 });
-
-                if (data.token) localStorage.setItem("token", data.token);
-                setEmail("");
-                setPassword("");
-                setConfirmPassword("");
-                setName("");
-                navigate("/");
-            } else {
+                navigate("/usuarios"); // 🔹 redirige al dashboard o lista de usuarios
+            } catch (error) {
                 toast.current.show({
                     severity: "error",
                     summary: "Error",
-                    detail: data.message || "Ocurrió un error",
+                    detail: "Correo o contraseña incorrectos",
                     life: 3000,
                 });
+                console.error(error);
             }
-        } catch (error) {
-            toast.current.show({
-                severity: "error",
-                summary: "Error",
-                detail: "Error de conexión con el servidor",
-                life: 3000,
-            });
-            console.error(error);
+        } else {
+            // 🔹 Registro
+            try {
+                const res = await fetch("http://localhost:3000/auth/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ nombre: name, correo: email, password }),
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    toast.current.show({
+                        severity: "success",
+                        summary: "Éxito",
+                        detail: "Registro exitoso! Ahora inicia sesión.",
+                        life: 2000,
+                    });
+                    setIsLogin(true); // vuelve a modo login
+                } else {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: data.message || "Ocurrió un error al registrarse",
+                        life: 3000,
+                    });
+                }
+            } catch (error) {
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "Error de conexión con el servidor",
+                    life: 3000,
+                });
+                console.error(error);
+            }
         }
+
+        // 🔹 limpiar campos
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+        setName("");
     };
 
     return (
@@ -88,11 +104,10 @@ export default function LoginForm() {
                 <p>Alquiler de autos fácil, rápido y seguro.</p>
             </div>
 
-            
             <div className="auth-hero-right">
                 <Toast ref={toast} />
-                <Card 
-                    title={isLogin ? "Iniciar Sesión" : "Crear Cuenta"} 
+                <Card
+                    title={isLogin ? "Iniciar Sesión" : "Crear Cuenta"}
                     className="auth-card"
                 >
                     <form onSubmit={handleSubmit} className="login-form flex flex-column gap-4">
