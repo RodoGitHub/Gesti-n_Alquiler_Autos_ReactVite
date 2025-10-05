@@ -6,7 +6,6 @@ import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Divider } from "primereact/divider";
-import "../../App.css";
 
 export default function RegisterForm() {
     const [name, setName] = useState('');
@@ -17,93 +16,134 @@ export default function RegisterForm() {
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (password !== confirmPassword) {
+    e.preventDefault();
+
+    if (password !== confirmPassword) {
+        toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Las contraseñas no coinciden",
+            life: 3000,
+        });
+        return;
+    }
+
+    try {
+        console.log("Enviando datos:", { name, email, password });
+        
+        const response = await fetch('http://localhost:3000/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                name: name, 
+                correo: email,  // CAMBIO AQUÍ: email -> correo
+                password: password 
+            }),
+        });
+
+        console.log("Status de respuesta:", response.status);
+        console.log("OK?", response.ok);
+
+        const data = await response.json();
+        console.log("Datos de respuesta:", data);
+
+        if (response.ok) {
+            toast.current.show({
+                severity: "success",
+                summary: "Éxito",
+                detail: "Usuario registrado correctamente!",
+                life: 3000,
+            });
+            setName('');
+            setEmail('');
+            setPassword('');
+            setConfirmPassword('');
+            
+            setTimeout(() => {
+                navigate("/");
+            }, 2000);
+        } else {
+            console.log("Error del servidor:", data);
             toast.current.show({
                 severity: "error",
                 summary: "Error",
-                detail: "Las contraseñas no coinciden",
+                detail: data.message || `Error ${response.status}: Error al registrar el usuario`,
                 life: 3000,
             });
-            return;
         }
-        try {
-            const response = await fetch('http://localhost:3000/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, correo: email, password }),
-            });
-            const data = await response.json();
-            if (response.ok) {
-                toast.current.show({
-                    severity: "success",
-                    summary: "Éxito",
-                    detail: "Usuario registrado correctamente!",
-                    life: 2000,
-                });
-                setName(''); setEmail(''); setPassword(''); setConfirmPassword('');
-                setTimeout(() => navigate("/login"), 2000);
-            } else {
-                toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: data.message || `Error ${response.status}: No se pudo registrar`,
-                    life: 3000,
-                });
-            }
-        } catch (error) {
-            toast.current.show({
-                severity: "error",
-                summary: "Error",
-                detail: `Error de conexión: ${error.message}`,
-                life: 3000,
-            });
-            console.error(error);
-        }
+    } catch (error) {
+        console.error("Error completo:", error);
+        toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: `Error de conexión: ${error.message}`,
+            life: 3000,
+        });
+    }
+};
+    const handleLoginRedirect = () => {
+        navigate("/login");
     };
 
-    const handleLoginRedirect = () => navigate("/login");
-
     return (
-        <div className="auth-hero">
-            <div className="auth-hero-left">
-                <h1>Crea tu cuenta</h1>
-                <h2>Tu viaje, tu libertad</h2>
-                <p>Disfruta de alquiler de autos simple, confiable y sin estrés.</p>
+        <div 
+            className="flex justify-content-center align-items-center bg-gray-100"
+            style={{ 
+                height: "100vh", 
+                width: "100vw",
+                padding: "1rem",
+                boxSizing: "border-box"
+            }}
+        >
+            <Toast ref={toast} />
+            <Card 
+                title="Registrarse" 
+                className="shadow-5 border-round-lg"
+                style={{ 
+                    width: "100%", 
+                    maxWidth: "450px",
+                    minHeight: "550px", // Reducido de 600px
+                    padding: "2rem"
+                }}
+            >
+                <form onSubmit={handleSubmit} className="flex flex-column gap-2"> 
+                    <div className="field">
+                        <label htmlFor="name" className="block text-lg font-medium mb-1"> 
+                            Nombre
+                        </label>
+                        <InputText
+                            id="name"
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Tu nombre completo"
+                            required
+                            className="w-full"
+                            size="large"
+                        />
+                    </div>
 
-            </div>
+                    <div className="field">
+                        <label htmlFor="email" className="block text-lg font-medium mb-1"> 
+                            Email
+                        </label>
+                        <InputText
+                            id="email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="ejemplo@correo.com"
+                            required
+                            className="w-full"
+                            size="large"
+                        />
+                    </div>
 
-            <div className="auth-hero-right">
-                <Toast ref={toast} />
-                <Card title="" className="auth-card compact-card">
-                    <form onSubmit={handleSubmit} className="login-form flex flex-column gap-2">
-                        <div className="p-field">
-                            <label htmlFor="name">Nombre completo</label>
-                            <InputText
-                                id="name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                placeholder="Tu nombre"
-                                required
-                                className="full-width compact-input"
-                            />
-                        </div>
-
-                        <div className="p-field">
-                            <label htmlFor="email">Email</label>
-                            <InputText
-                                id="email"
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="ejemplo@correo.com"
-                                required
-                                className="full-width compact-input"
-                            />
-                        </div>
-
-                        <div className="p-field">
-                            <label htmlFor="password">Contraseña</label>
+                    <div className="field">
+                        <label htmlFor="password" className="block text-lg font-medium mb-1"> 
+                            Contraseña
+                        </label>
+                        <div className="w-full">
                             <Password
                                 id="password"
                                 value={password}
@@ -112,46 +152,57 @@ export default function RegisterForm() {
                                 feedback={false}
                                 placeholder="Contraseña"
                                 required
-                                className="full-width compact-input"
-                                inputClassName="full-width"
+                                className="w-full"
+                                inputClassName="w-full"
+                                size="large"
+                                style={{ width: '100%' }}
                             />
                         </div>
+                    </div>
 
-                        <div className="p-field">
-                            <label htmlFor="confirmPassword">Confirmar contraseña</label>
+                    <div className="field">
+                        <label htmlFor="confirmPassword" className="block text-lg font-medium mb-1">
+                            Confirmar Contraseña
+                        </label>
+                        <div className="w-full">
                             <Password
                                 id="confirmPassword"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 toggleMask
                                 feedback={false}
-                                placeholder="Repite tu contraseña"
+                                placeholder="Confirmar contraseña"
                                 required
-                                className="full-width compact-input"
-                                inputClassName="full-width"
+                                className="w-full"
+                                inputClassName="w-full"
+                                size="large"
+                                style={{ width: '100%' }}
                             />
                         </div>
-
-                        <Button
-                            type="submit"
-                            label="Registrarse"
-                            icon="pi pi-user-plus"
-                            className="p-button-primary p-button-rounded full-width compact-button"
-                        />
-                    </form>
-
-                    <Divider className="my-2" />
-
-                    <div className="text-center compact-login-redirect">
-                        <p>¿Ya tienes cuenta?</p>
-                        <Button
-                            label="Iniciar Sesión"
-                            className="p-button-text p-button-sm"
-                            onClick={handleLoginRedirect}
-                        />
                     </div>
-                </Card>
-            </div>
+
+                    <Button
+                        type="submit"
+                        label="Registrarse"
+                        icon="pi pi-user-plus"
+                        className="p-button-rounded p-button-success w-full mt-2" 
+                        size="large"
+                    />
+                </form>
+
+                <Divider className="my-3" /> 
+
+                <div className="text-center">
+                    <p className="text-lg mb-1"> 
+                        ¿Ya tenés cuenta?
+                    </p>
+                    <Button
+                        label="Iniciar Sesión"
+                        className="p-button-text p-button-lg"
+                        onClick={handleLoginRedirect}
+                    />
+                </div>
+            </Card>
         </div>
     );
 }

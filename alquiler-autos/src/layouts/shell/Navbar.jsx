@@ -1,3 +1,4 @@
+// src/components/layout/Navbar.jsx
 import { Link } from "react-router-dom";
 import { Button } from "primereact/button";
 import { useContext } from "react";
@@ -7,10 +8,10 @@ const Navbar = () => {
     const { user, status, signOut } = useContext(AuthContext);
 
     return (
-        <div className="navbar flex justify-content-between align-items-center p-3 shadow-2">
-        <h2 className="navbar-title">AutoGo! Alquiler de Autos</h2>
-
-        <div className="navbar-buttons flex gap-2">
+        <div className="navbar p-d-flex p-jc-between p-ai-center p-p-3 p-shadow-2">
+        <h2 className="navbar-title">Alquiler de Autos</h2>
+        
+        <div className="navbar-buttons p-d-flex p-gap-2">
             {status === "authenticated" && user ? (
             <>
                 <Link to="/usuarios">
@@ -19,10 +20,10 @@ const Navbar = () => {
                 <Link to="/productos">
                 <Button label="Productos" className="p-button-outlined p-button-light" />
                 </Link>
-                <Button
-                label="Cerrar Sesión"
-                className="p-button-danger"
-                onClick={signOut}
+                <Button 
+                label="Cerrar Sesión" 
+                className="p-button-danger" 
+                onClick={signOut} 
                 />
             </>
             ) : (
@@ -38,6 +39,6 @@ const Navbar = () => {
         </div>
         </div>
     );
-};
+    };
 
 export default Navbar;
