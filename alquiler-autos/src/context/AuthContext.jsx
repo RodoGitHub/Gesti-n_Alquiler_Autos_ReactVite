@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 
 export const AuthContext = createContext(null);
@@ -7,7 +7,6 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [status, setStatus] = useState("loading"); 
 
- 
   const fetchAndSetUser = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -16,10 +15,9 @@ export function AuthProvider({ children }) {
     }
 
     try {
-      const res = await axios.get("http://localhost:3000/register/me", {
+      const res = await axios.get("http://localhost:3000/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       setUser(res.data);
       setStatus("authenticated");
     } catch (error) {
@@ -34,10 +32,10 @@ export function AuthProvider({ children }) {
     fetchAndSetUser();
   }, []);
 
- 
+
   const signIn = async (credentials) => {
     try {
-      const res = await axios.post("http://localhost:3000/register/login", credentials);
+      const res = await axios.post("http://localhost:3000/auth/login", credentials);
       localStorage.setItem("token", res.data.token);
       await fetchAndSetUser();
     } catch (error) {
@@ -46,7 +44,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-  
+ 
   const signOut = () => {
     localStorage.removeItem("token");
     setUser(null);
@@ -59,3 +57,5 @@ export function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
+
+export const useAuth = () => useContext(AuthContext);

@@ -1,4 +1,5 @@
-import { useContext, } from "react";
+import { useContext } from "react";
+import { Link } from "react-router-dom"; 
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { Panel } from "primereact/panel";
@@ -8,7 +9,6 @@ import { AuthContext } from "../../context/AuthContext";
 
 export default function HomeView() {
   const { user, status } = useContext(AuthContext);
-  
 
   if (status === "loading") {
     return (
