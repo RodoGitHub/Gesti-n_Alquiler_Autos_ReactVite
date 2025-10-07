@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "primereact/card";
 import { InputText } from "primereact/inputtext";
@@ -6,203 +6,139 @@ import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { Divider } from "primereact/divider";
+import { resource } from "../../services/api"; 
+import "primeflex/primeflex.css";
+
+const registerService = resource("auth/register", "Autenticación");
 
 export default function RegisterForm() {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const toast = useRef(null);
     const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (password !== confirmPassword) {
-        toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: "Las contraseñas no coinciden",
-            life: 3000,
-        });
-        return;
-    }
-
-    try {
-        console.log("Enviando datos:", { name, email, password });
-        
-        const response = await fetch('http://localhost:3000/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                name: name, 
-                correo: email,  // CAMBIO AQUÍ: email -> correo
-                password: password 
-            }),
-        });
-
-        console.log("Status de respuesta:", response.status);
-        console.log("OK?", response.ok);
-
-        const data = await response.json();
-        console.log("Datos de respuesta:", data);
-
-        if (response.ok) {
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        if(password !== confirmPassword) {
+            toast.current.show({
+                severity: "warn",
+                summary: "Advertencia",
+                detail: "Las contraseñas no coinciden",
+                life: 2000,
+            });
+            return;
+        }
+        try {
+            await registerService.create({ nombre: name, correo: email, password });
             toast.current.show({
                 severity: "success",
                 summary: "Éxito",
-                detail: "Usuario registrado correctamente!",
-                life: 3000,
+                detail: "Registro exitoso, ahora inicia sesión.",
+                life: 2500,
             });
-            setName('');
-            setEmail('');
-            setPassword('');
-            setConfirmPassword('');
-            
-            setTimeout(() => {
-                navigate("/");
-            }, 2000);
-        } else {
-            console.log("Error del servidor:", data);
+            navigate("/login");
+        } catch (error) {
             toast.current.show({
                 severity: "error",
                 summary: "Error",
-                detail: data.message || `Error ${response.status}: Error al registrar el usuario`,
+                detail: error.message || "No se pudo conectar con el servidor",
                 life: 3000,
             });
         }
-    } catch (error) {
-        console.error("Error completo:", error);
-        toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: `Error de conexión: ${error.message}`,
-            life: 3000,
-        });
-    }
-};
-    const handleLoginRedirect = () => {
-        navigate("/login");
     };
 
     return (
-        <div 
-            className="flex justify-content-center align-items-center bg-gray-100"
-            style={{ 
-                height: "100vh", 
-                width: "100vw",
-                padding: "1rem",
-                boxSizing: "border-box"
-            }}
-        >
+        <div className="h-screen w-screen flex overflow-hidden">
             <Toast ref={toast} />
-            <Card 
-                title="Registrarse" 
-                className="shadow-5 border-round-lg"
-                style={{ 
-                    width: "100%", 
-                    maxWidth: "450px",
-                    minHeight: "550px", // Reducido de 600px
-                    padding: "2rem"
-                }}
-            >
-                <form onSubmit={handleSubmit} className="flex flex-column gap-2"> 
-                    <div className="field">
-                        <label htmlFor="name" className="block text-lg font-medium mb-1"> 
-                            Nombre
-                        </label>
-                        <InputText
-                            id="name"
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Tu nombre completo"
-                            required
-                            className="w-full"
-                            size="large"
-                        />
-                    </div>
 
-                    <div className="field">
-                        <label htmlFor="email" className="block text-lg font-medium mb-1"> 
-                            Email
-                        </label>
-                        <InputText
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="ejemplo@correo.com"
-                            required
-                            className="w-full"
-                            size="large"
-                        />
-                    </div>
+            
+            <div className="hidden md:flex md:w-1/2 bg-blue-900 flex-col justify-center items-center text-white p-8">
+                <h1 className="text-5xl font-bold mb-2">AutoGo!</h1>
+                <h2 className="text-2xl font-medium text-blue-200 mb-4">Tu viaje comienza aquí</h2>
+                <p className="text-lg text-gray-300 max-w-md text-center">
+                    Alquiler de autos fácil, rápido y seguro.
+                </p>
+            </div>
 
-                    <div className="field">
-                        <label htmlFor="password" className="block text-lg font-medium mb-1"> 
-                            Contraseña
-                        </label>
-                        <div className="w-full">
+            
+            <div className="flex flex-1 justify-center items-center bg-gray-100 p-8">
+                <Card title="Crear Cuenta" className="w-full max-w-md p-6 rounded-lg shadow-lg">
+                    <form onSubmit={handleRegister} className="p-fluid flex flex-col gap-4">
+                        <div className="p-field">
+                            <label htmlFor="name">Nombre completo</label>
+                            <InputText
+                                id="name"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                placeholder="Tu nombre"
+                                required
+                                className="rounded-md border border-gray-400 p-2"
+                            />
+                        </div>
+
+                        <div className="p-field">
+                            <label htmlFor="email">Email</label>
+                            <InputText
+                                id="email"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="ejemplo@correo.com"
+                                required
+                                className="rounded-md border border-gray-400 p-2"
+                            />
+                        </div>
+
+                        <div className="p-field">
+                            <label htmlFor="password">Contraseña</label>
                             <Password
                                 id="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 toggleMask
                                 feedback={false}
-                                placeholder="Contraseña"
                                 required
-                                className="w-full"
-                                inputClassName="w-full"
-                                size="large"
-                                style={{ width: '100%' }}
+                                placeholder="Contraseña"
+                                inputClassName="rounded-md border border-gray-400 p-2"
                             />
                         </div>
-                    </div>
 
-                    <div className="field">
-                        <label htmlFor="confirmPassword" className="block text-lg font-medium mb-1">
-                            Confirmar Contraseña
-                        </label>
-                        <div className="w-full">
+                        <div className="p-field">
+                            <label htmlFor="confirmPassword">Confirmar contraseña</label>
                             <Password
                                 id="confirmPassword"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 toggleMask
                                 feedback={false}
-                                placeholder="Confirmar contraseña"
                                 required
-                                className="w-full"
-                                inputClassName="w-full"
-                                size="large"
-                                style={{ width: '100%' }}
+                                placeholder="Repite tu contraseña"
+                                inputClassName="rounded-md border border-gray-400 p-2"
                             />
                         </div>
+
+                        <Button
+                            type="submit"
+                            label="Registrarse"
+                            icon="pi pi-user-plus"
+                            className="p-button-rounded w-full"
+                            style={{ backgroundColor: "#FF6B35", border: "none", fontWeight: "bold" }}
+                        />
+                    </form>
+
+                    <Divider />
+                    <div className="text-center">
+                        <p>¿Ya tienes cuenta?</p>
+                        <Button
+                            label="Iniciar Sesión"
+                            className="p-button-text"
+                            onClick={() => navigate("/login")}
+                        />
                     </div>
-
-                    <Button
-                        type="submit"
-                        label="Registrarse"
-                        icon="pi pi-user-plus"
-                        className="p-button-rounded p-button-success w-full mt-2" 
-                        size="large"
-                    />
-                </form>
-
-                <Divider className="my-3" /> 
-
-                <div className="text-center">
-                    <p className="text-lg mb-1"> 
-                        ¿Ya tenés cuenta?
-                    </p>
-                    <Button
-                        label="Iniciar Sesión"
-                        className="p-button-text p-button-lg"
-                        onClick={handleLoginRedirect}
-                    />
-                </div>
-            </Card>
+                </Card>
+            </div>
         </div>
     );
 }

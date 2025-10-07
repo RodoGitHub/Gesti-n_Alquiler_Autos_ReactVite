@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "primereact/button";
 import { useContext } from "react";
-import { AuthContext } from "../../context/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 
 const Navbar = () => {
     const { user, status, signOut } = useContext(AuthContext);

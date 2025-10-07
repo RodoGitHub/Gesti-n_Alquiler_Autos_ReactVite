@@ -1,13 +1,15 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-import MainLayout from "./layouts/shell/MainLayout";
+
+import MainLayout from "./components/MainLayout";
+import GlobalLoader from "./components/GlobalLoader";
+
 import HomeView from "./layouts/home/HomeView";
 import LoginForm from "./layouts/auth/LoginForm";
 import RegisterForm from "./layouts/auth/RegisterForm";
 import UserForm from "./layouts/users/UserForm";
 import UserList from "./layouts/users/UserList";
 import ProductForm from "./layouts/products/ProductForm"; 
-import GlobalLoader from "./layouts/shell/GlobalLoader";
 
 import "primereact/resources/themes/lara-light-indigo/theme.css";
 import "primereact/resources/primereact.min.css";
