@@ -8,42 +8,6 @@ html, body, #root {
   box-sizing: border-box;
   overflow-x: hidden;
 }
-
-/* Estilos generales de PrimeReact */
-.p-inputtext, .p-password input {
-  border-radius: 8px;
-  border: 1px solid #B0B0B0;
-  padding: 0.8rem;
-  transition: border 0.3s;
-}
-
-.p-inputtext:focus, .p-password input:focus {
-  border: 2px solid #FF6B35;
-  outline: none;
-}
-
-.p-button {
-  border-radius: 50px;
-  font-weight: bold;
-  padding: 0.8rem 1.5rem;
-  transition: background 0.3s;
-}
-
-.p-button-primary {
-  background: #FF6B35;
-  border: none;
-  color: white;
-}
-
-.p-button-primary:hover {
-  background: #FFC300;
-  color: #0D3B66;
-}
-
-.p-button-text {
-  color: #007AD9;
-}
-
 .p-toast-message-success {
   background-color: #27AE60 !important;
   color: white !important;
