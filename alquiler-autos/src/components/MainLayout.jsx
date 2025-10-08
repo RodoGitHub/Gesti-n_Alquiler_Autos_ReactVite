@@ -3,30 +3,24 @@ import { Toast } from "primereact/toast";
 import { useRef } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import GlobalLoader from "./GlobalLoader"; 
+import GlobalLoader from "./GlobalLoader";
+
 const MainLayout = () => {
     const toast = useRef(null);
 
     return (
-        <div className="p-d-flex p-flex-column" style={{ minHeight: "100vh" }}>
-        {/* Spinner global */}
+        <div style={{ display: "flex", flexDirection: "column", minHeight: "85vh", margin: 0, padding: 0 }}>
         <GlobalLoader />
-
-        {/* Barra de navegación */}
-        <Navbar toast={toast} />
-
-        {/* Contenido principal */}
-        <div className="p-flex-1 p-p-3" style={{ flexGrow: 1 }}>
+        <Navbar toast={toast} style={{ margin: 0, padding: 0 }} />
+        <div style={{ flexGrow: 1, padding: 0, margin: 0 }}>
             <Outlet context={{ toast }} />
         </div>
-
-        {/* Footer */}
-        <Footer />
-
-        {/* Toast global */}
+        <Footer style={{ margin: 0, padding: 0 }} />
         <Toast ref={toast} />
         </div>
     );
 };
 
 export default MainLayout;
+
+

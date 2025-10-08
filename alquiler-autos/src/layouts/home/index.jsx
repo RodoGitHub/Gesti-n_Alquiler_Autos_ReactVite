@@ -12,8 +12,7 @@ const DashboardLayout = () => {
     return (
         <div className="min-h-screen flex flex-column">
         <Menubar model={items} />
-        <div className="p-4">
-            {/* Aquí se cargan las páginas hijas */}
+        <div className="p-4">            
             <Outlet />
         </div>
         </div>
