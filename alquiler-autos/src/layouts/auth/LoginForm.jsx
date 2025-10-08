@@ -45,45 +45,63 @@ export default function AuthForm() {
     };
 
     return (
-        <div className="surface-0 flex h-screen w-screen">
+        <div className="flex flex-column md:flex-row h-screen w-screen surface-900">
             <Toast ref={toast} />
-            <div className="hidden md:flex md:flex-1 bg-blue-900 flex-col justify-between p-8 h-full text-white">
-                <div className="flex flex-col items-center">
-                    <h1 className="text-5xl font-bold mb-2">AutoGo!</h1>
-                    <h2 className="text-2xl font-medium text-blue-200 mt-2">Tu viaje comienza aquí</h2>
+
+            {/* LADO IZQUIERDO */}
+            <div className="hidden md:flex md:flex-column md:justify-content-center md:align-items-center flex-1 text-white p-8">
+                <div className="text-center">
+                    <h1 className="text-5xl font-bold mb-3">AutoGo!</h1>
+                    <h2 className="text-2xl font-medium mb-6">Tu viaje comienza aquí</h2>
+                    <p className="text-lg text-gray-300">Alquiler de autos fácil, rápido y seguro.</p>
                 </div>
-                <p className="text-lg text-gray-300 text-center mt-auto">Alquiler de autos fácil, rápido y seguro.</p>
             </div>
 
-            <div className="flex flex-1 justify-center items-center p-6 bg-gray-100">
-                <Card title={isLogin ? "Iniciar Sesión" : "Crear Cuenta"} className="w-full max-w-md p-6 shadow-2 flex flex-col gap-4">
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            {/* LADO DERECHO */}
+            <div className="flex align-items-center justify-content-center flex-1 bg-gray-100">
+                <Card className="w-full max-w-25rem p-5 shadow-3 border-round-xl">
+                    <div className="text-center mb-4">
+                        <h2 className="text-2xl font-semibold">{isLogin ? "Iniciar Sesión" : "Crear Cuenta"}</h2>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="flex flex-column gap-3">
                         {!isLogin && (
-                            <div className="p-field">
-                                <label htmlFor="name">Nombre completo</label>
-                                <InputText id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Tu nombre" required className="w-full" />
+                            <div className="flex flex-column gap-2">
+                                <label htmlFor="name" className="font-medium">Nombre completo</label>
+                                <InputText id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Tu nombre" required />
                             </div>
                         )}
-                        <div className="p-field">
-                            <label htmlFor="email">Email</label>
-                            <InputText id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ejemplo@correo.com" required className="w-full" />
+                        <div className="flex flex-column gap-2">
+                            <label htmlFor="email" className="font-medium">Email</label>
+                            <InputText id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ejemplo@correo.com" required />
                         </div>
-                        <div className="p-field">
-                            <label htmlFor="password">Contraseña</label>
-                            <Password id="password" value={password} onChange={(e) => setPassword(e.target.value)} toggleMask feedback={false} required placeholder="Contraseña" className="w-full" />
+                        <div className="flex flex-column gap-2">
+                            <label htmlFor="password" className="font-medium">Contraseña</label>
+                            <Password id="password" value={password} onChange={(e) => setPassword(e.target.value)} toggleMask feedback={false} required placeholder="Contraseña" />
                         </div>
                         {!isLogin && (
-                            <div className="p-field">
-                                <label htmlFor="confirmPassword">Confirmar contraseña</label>
-                                <Password id="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} toggleMask feedback={false} required placeholder="Repite tu contraseña" className="w-full" />
+                            <div className="flex flex-column gap-2">
+                                <label htmlFor="confirmPassword" className="font-medium">Confirmar contraseña</label>
+                                <Password id="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} toggleMask feedback={false} required placeholder="Repite tu contraseña" />
                             </div>
                         )}
-                        <Button type="submit" label={isLogin ? "Ingresar" : "Registrarse"} icon={isLogin ? "pi pi-sign-in" : "pi pi-user-plus"} className="p-button-rounded w-full" style={{ backgroundColor: "#FF6B35", border: "none", fontWeight: "bold" }} />
+                        <Button
+                            type="submit"
+                            label={isLogin ? "Ingresar" : "Registrarse"}
+                            icon={isLogin ? "pi pi-sign-in" : "pi pi-user-plus"}
+                            className="w-full p-button-rounded font-bold"
+                            style={{ backgroundColor: "#FF6B35", border: "none" }}
+                        />
                     </form>
+
                     <Divider />
                     <div className="text-center">
-                        <p>{isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}</p>
-                        <Button label={isLogin ? "Registrarse" : "Iniciar Sesión"} className="p-button-text" onClick={() => setIsLogin(!isLogin)} />
+                        <p className="mb-2">{isLogin ? "¿No tienes cuenta?" : "¿Ya tienes cuenta?"}</p>
+                        <Button
+                            label={isLogin ? "Registrarse" : "Iniciar Sesión"}
+                            className="p-button-text text-primary font-bold"
+                            onClick={() => setIsLogin(!isLogin)}
+                        />
                     </div>
                 </Card>
             </div>
