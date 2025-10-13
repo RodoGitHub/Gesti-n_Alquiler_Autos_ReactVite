@@ -45,18 +45,18 @@ export default function AuthForm() {
     };
 
     return (
-        <div className="surface-0 flex h-screen w-screen">
-            <Toast ref={toast} />
-            <div className="hidden md:flex md:flex-1 bg-blue-900 flex-col justify-between p-8 h-full text-white">
-                <div className="flex flex-col items-center">
-                    <h1 className="text-5xl font-bold mb-2">AutoGo!</h1>
-                    <h2 className="text-2xl font-medium text-blue-200 mt-2">Tu viaje comienza aquí</h2>
-                </div>
-                <p className="text-lg text-gray-300 text-center mt-auto">Alquiler de autos fácil, rápido y seguro.</p>
+        <div className="flex flex-col md:flex-row h-screen w-screen">
+            {/* Panel lateral solo visible en pantallas medianas y grandes */}
+            <div className="hidden md:flex md:flex-1 bg-blue-900 flex-col justify-center items-center p-10 text-white">
+                <h1 className="text-5xl font-bold mb-4">AutoGo!</h1>
+                <h2 className="text-2xl font-medium text-blue-200 mb-6">Tu viaje comienza aquí</h2>
+                <p className="text-lg text-gray-300 text-center">Alquiler de autos fácil, rápido y seguro.</p>
             </div>
 
+            {/* Formulario */}
             <div className="flex flex-1 justify-center items-center p-6 bg-gray-100">
                 <Card title={isLogin ? "Iniciar Sesión" : "Crear Cuenta"} className="w-full max-w-md p-6 shadow-2 flex flex-col gap-4">
+                    <Toast ref={toast} />
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                         {!isLogin && (
                             <div className="p-field">
