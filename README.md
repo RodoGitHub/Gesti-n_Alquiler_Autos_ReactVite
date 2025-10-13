@@ -25,7 +25,7 @@ Editar `.env` con tus datos:
 ```
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=3232
+DB_PASSWORD=
 DB_NAME=alquiler_autos
 JWT_SECRET=TuClaveSecreta
 ```
@@ -39,8 +39,6 @@ npm install
 ```bash
 npm run dev
 ```
-
-Abrir en navegador: [http://localhost:3000](http://localhost:3000)
 
 ## Contribuciones
 - Fork → crear rama nueva → commit → push → Pull Request
