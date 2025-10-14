@@ -2,7 +2,7 @@ import axios from "axios";
 import { startLoading, stopLoading } from "../core/loading-bus";
 
 export const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+    baseURL: import.meta.env.VITE_API_BASE_URL || "/",
     timeout: 10000,
 });
 
@@ -16,7 +16,7 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
     (res) => res,
-    async (error) => {
+    (error) => {
         stopLoading();
         const status = error?.response?.status;
 

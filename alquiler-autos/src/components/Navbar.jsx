@@ -1,64 +1,48 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Menubar } from "primereact/menubar";
 import { Button } from "primereact/button";
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
-    const { user, status, signOut } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    return (
-        <div
+    const start = (
+        <span
         style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "1rem",
-            background: "#1976d2",
-            flexWrap: "nowrap",
+            fontWeight: "bold",
+            color: "white",
+            fontSize: "1.3rem",
+            marginLeft: "0.5rem",
         }}
         >
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <h2 style={{ margin: 0, color: "#fff", whiteSpace: "nowrap" }}>
-            AutoGo!
-            </h2>
-            {status === "authenticated" && user && (
-            <Button
-                icon="pi pi-home"
-                className="p-button-rounded p-button-outlined"
-                onClick={() => navigate("/")}
-                title="Inicio"
-            />
-            )}
-        </div>
+        AutoGo!
+        </span>
+    );
 
-        <div style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
-            {status === "authenticated" && user ? (
-            <>
-                <Link to="/usuarios">
-                <Button label="Usuarios" icon="pi pi-users" className="p-button-outlined" />
-                </Link>
-                <Link to="/productos">
-                <Button label="Productos" icon="pi pi-box" className="p-button-outlined" />
-                </Link>
-                <Button
-                label="Cerrar Sesión"
-                className="p-button-danger"
-                onClick={signOut}
-                />
-            </>
-            ) : (
-            <>
-                <Link to="/login">
-                <Button label="Iniciar Sesión" className="p-button-primary" />
-                </Link>
-                <Link to="/register">
-                <Button label="Registrarse" className="p-button-secondary" />
-                </Link>
-            </>
-            )}
+    const end = (
+        <div className="flex align-items-center gap-2">
+        <Button
+            label="Iniciar Sesión"
+            className="p-button-rounded p-button-sm p-button-secondary"
+            onClick={() => navigate("/login")}
+        />
+        <Button
+            label="Registrarse"
+            className="p-button-rounded p-button-sm p-button-primary"
+            onClick={() => navigate("/register")}
+        />
         </div>
-        </div>
+    );
+
+    return (
+        <Menubar
+        start={start}
+        end={end}
+        style={{
+            background: "#007ad9",
+            border: "none",
+            padding: "0.5rem 1rem",
+        }}
+        />
     );
 };
 
