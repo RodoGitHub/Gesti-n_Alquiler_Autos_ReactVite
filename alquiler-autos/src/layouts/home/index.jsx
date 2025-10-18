@@ -1,8 +1,7 @@
-// src/layouts/home/index.jsx
 import { Outlet, Link } from "react-router-dom";
 import { Menubar } from "primereact/menubar";
 
-const DashboardLayout = () => {
+const MainLayout = () => {
     const items = [
         { label: "Inicio", icon: "pi pi-home", url: "/" },
         { label: "Usuarios", icon: "pi pi-users", url: "/usuarios" },
@@ -19,4 +18,4 @@ const DashboardLayout = () => {
     );
 };
 
-export default DashboardLayout;
+export default MainLayout;

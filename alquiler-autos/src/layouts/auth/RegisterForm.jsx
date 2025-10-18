@@ -21,6 +21,7 @@ export default function RegisterForm() {
 
     const toast = useRef(null);
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -31,37 +32,27 @@ export default function RegisterForm() {
         e.preventDefault();
 
         if (form.password !== form.confirmPassword) {
-            toast.current.show({
-                severity: "warn",
-                summary: "Advertencia",
-                detail: "Las contraseñas no coinciden",
-                life: 2000,
-            });
+            toast.current.show({ severity: "warn", summary: "Advertencia", detail: "Las contraseñas no coinciden", life: 2000 });
             return;
         }
 
+        if (form.password.length < 8) {
+            toast.current.show({ severity: "warn", summary: "Advertencia", detail: "La contraseña debe tener al menos 8 caracteres", life: 2500 });
+            return;
+        }
+
+        setLoading(true);
+
         try {
-            await registerService.create({
-                nombre: form.name,
-                correo: form.email,
-                password: form.password,
-            });
+            await registerService.create({ nombre: form.name, correo: form.email.trim(), password: form.password });
 
-            toast.current.show({
-                severity: "success",
-                summary: "Éxito",
-                detail: "Registro exitoso, ahora inicia sesión.",
-                life: 2500,
-            });
-
-            navigate("/login");
+            toast.current.show({ severity: "success", summary: "Éxito", detail: "Registro exitoso, ahora inicia sesión.", life: 2500 });
+            navigate("/login", { replace: true });
         } catch (error) {
-            toast.current.show({
-                severity: "error",
-                summary: "Error",
-                detail: error.message || "No se pudo conectar con el servidor",
-                life: 3000,
-            });
+            const msg = error?.message || "No se pudo conectar con el servidor";
+            toast.current.show({ severity: "error", summary: "Error", detail: msg, life: 3000 });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -102,7 +93,7 @@ export default function RegisterForm() {
                             <Password id="confirmPassword" value={form.confirmPassword} onChange={(e) => setForm(prev => ({ ...prev, confirmPassword: e.target.value }))} toggleMask feedback={false} placeholder="Repite tu contraseña" required className="w-full" />
                         </div>
 
-                        <Button type="submit" label="Registrarse" icon="pi pi-user-plus" className="w-full p-button-rounded font-bold" style={{ backgroundColor: "#FF6B35", border: "none" }} />
+                        <Button type="submit" label="Registrarse" icon="pi pi-user-plus" className="w-full p-button-rounded font-bold" style={{ backgroundColor: "#FF6B35", border: "none" }} loading={loading} disabled={loading} />
                     </form>
 
                     <Divider />
