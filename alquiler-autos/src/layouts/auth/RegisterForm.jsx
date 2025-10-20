@@ -56,50 +56,79 @@ export default function RegisterForm() {
         }
     };
 
+    
     return (
-        <div className="flex h-screen w-screen">
+        <div className="flex flex-col md:flex-row h-screen w-screen">
             <Toast ref={toast} />
 
-            <div className="hidden md:flex md:flex-1 flex-column justify-content-center align-items-center p-6" style={{ backgroundColor: "#1F2937", color: "white" }}>
-                <h1 className="text-6xl font-bold mb-3">AutoGo!</h1>
-                <h2 className="text-2xl mb-4" style={{ color: "#BFDBFE" }}>Tu viaje comienza aquí</h2>
-                <p className="text-lg text-center" style={{ color: "#D1D5DB", maxWidth: "20rem" }}>Alquiler de autos fácil, rápido y seguro.</p>
+            <div className="hidden md:flex md:flex-1 flex-column justify-content-center align-items-center p-4 md:p-6" style={{ backgroundColor: '#1F2937', color: 'white' }}>
+                <h1 className="text-4xl md:text-6xl font-bold mb-2 md:mb-3">AutoGo!</h1>
+                <h2 className="text-lg md:text-2xl mb-3 md:mb-4" style={{ color: '#BFDBFE' }}>Crea tu cuenta</h2>
+                <p className="text-sm md:text-lg text-gray-300 text-center">Gestioná tus reservas de forma fácil y rápida.</p>
             </div>
 
-            <div className="flex align-items-center justify-center flex-1 bg-gray-100 p-6">
-                <Card className="w-full max-w-25rem p-5 shadow-3 border-round-xl">
-                    <div className="text-center mb-4">
-                        <h2 className="text-2xl font-semibold">Crear Cuenta</h2>
-                    </div>
-
-                    <form onSubmit={handleRegister} className="flex flex-column gap-3">
-                        <div className="flex flex-column gap-2">
-                            <label htmlFor="name" className="font-medium">Nombre completo</label>
-                            <InputText id="name" value={form.name} onChange={handleChange} placeholder="Tu nombre" required />
+            <div className="flex align-items-center justify-content-center flex-1 bg-gray-100 p-2 md:p-4">
+                <Card title="Crear Cuenta" className="w-full max-w-18rem md:max-w-22rem p-2 md:p-4 shadow-3 border-round-xl">
+                    <form onSubmit={handleRegister} className="flex flex-column gap-1 md:gap-2">
+                        <div className="p-field">
+                            <label htmlFor="name" className="font-medium text-sm mb-1 block">Nombre completo</label>
+                            <InputText id="name" value={form.name} onChange={handleChange} placeholder="Tu nombre" required className="w-full" />
                         </div>
 
-                        <div className="flex flex-column gap-2">
-                            <label htmlFor="email" className="font-medium">Email</label>
-                            <InputText id="email" type="email" value={form.email} onChange={handleChange} placeholder="ejemplo@correo.com" required />
+                        <div className="p-field">
+                            <label htmlFor="email" className="font-medium text-sm mb-1 block">Correo electrónico</label>
+                            <InputText id="email" type="email" value={form.email} onChange={handleChange} placeholder="ejemplo@correo.com" required className="w-full" />
                         </div>
 
-                        <div className="flex flex-column gap-2">
-                            <label htmlFor="password" className="font-medium">Contraseña</label>
-                            <Password id="password" value={form.password} onChange={(e) => setForm(prev => ({ ...prev, password: e.target.value }))} toggleMask feedback={false} placeholder="Contraseña" required className="w-full" />
+                        <div className="flex flex-column gap-1">
+                            <div className="p-field">
+                                <label htmlFor="password" className="font-medium text-sm mb-1 block">Contraseña</label>
+                                <Password 
+                                    id="password" 
+                                    value={form.password} 
+                                    onChange={(e) => setForm(prev => ({ ...prev, password: e.target.value }))} 
+                                    toggleMask 
+                                    feedback={false} 
+                                    placeholder="********" 
+                                    required 
+                                    className="w-full" 
+                                />
+                            </div>
+                            <div className="p-field">
+                                <label htmlFor="confirmPassword" className="font-medium text-sm mb-1 block">Confirmar</label>
+                                <Password 
+                                    id="confirmPassword" 
+                                    value={form.confirmPassword} 
+                                    onChange={(e) => setForm(prev => ({ ...prev, confirmPassword: e.target.value }))} 
+                                    toggleMask 
+                                    feedback={false} 
+                                    placeholder="********" 
+                                    required 
+                                    className="w-full" 
+                                />
+                            </div>
                         </div>
 
-                        <div className="flex flex-column gap-2">
-                            <label htmlFor="confirmPassword" className="font-medium">Confirmar contraseña</label>
-                            <Password id="confirmPassword" value={form.confirmPassword} onChange={(e) => setForm(prev => ({ ...prev, confirmPassword: e.target.value }))} toggleMask feedback={false} placeholder="Repite tu contraseña" required className="w-full" />
-                        </div>
 
-                        <Button type="submit" label="Registrarse" icon="pi pi-user-plus" className="w-full p-button-rounded font-bold" style={{ backgroundColor: "#FF6B35", border: "none" }} loading={loading} disabled={loading} />
+                        <Button
+                            type="submit"
+                            label="Registrarse"
+                            icon="pi pi-user-plus"
+                            className="w-full p-button-rounded font-bold text-sm"
+                            style={{ backgroundColor: "#FF6B35", border: "none", padding: '0.6rem 1rem' }}
+                            loading={loading}
+                            disabled={loading}
+                        />
                     </form>
 
-                    <Divider />
-                    <div className="text-center">
-                        <p>¿Ya tienes cuenta?</p>
-                        <Button label="Iniciar Sesión" className="p-button-text" onClick={() => navigate("/login")} />
+                    <Divider className="hidden md:block" />
+                    <div className="text-center mt-1 md:mt-0">
+                        <p className="mb-2">¿Ya tienes cuenta?</p>
+                        <Button
+                            label="Iniciar Sesión"
+                            className="p-button-text text-primary font-bold"
+                            onClick={() => navigate("/login")}
+                        />
                     </div>
                 </Card>
             </div>
