@@ -67,9 +67,13 @@ export default function RegisterForm() {
                 <p className="text-sm md:text-lg text-gray-300 text-center">Gestioná tus reservas de forma fácil y rápida.</p>
             </div>
 
-            <div className="flex align-items-center justify-content-center flex-1 bg-gray-100 p-2 md:p-4">
-                <Card title="Crear Cuenta" className="w-full max-w-18rem md:max-w-22rem p-2 md:p-4 shadow-3 border-round-xl">
-                    <form onSubmit={handleRegister} className="flex flex-column gap-1 md:gap-2">
+            <div className="flex align-items-center justify-content-center flex-1 bg-gray-100 p-6">
+                <Card 
+                    title="Crear Cuenta" 
+                    className="w-full" 
+                    style={{ maxWidth: '25rem', minWidth: '300px', padding: '2rem' }}
+                >
+                    <form onSubmit={handleRegister} className="flex flex-column gap-3">
                         <div className="p-field">
                             <label htmlFor="name" className="font-medium text-sm mb-1 block">Nombre completo</label>
                             <InputText id="name" value={form.name} onChange={handleChange} placeholder="Tu nombre" required className="w-full" />
@@ -109,7 +113,6 @@ export default function RegisterForm() {
                             </div>
                         </div>
 
-
                         <Button
                             type="submit"
                             label="Registrarse"
@@ -121,7 +124,8 @@ export default function RegisterForm() {
                         />
                     </form>
 
-                    <Divider className="hidden md:block" />
+                    <Divider className="hidden md:block my-4" />
+
                     <div className="text-center mt-1 md:mt-0">
                         <p className="mb-2">¿Ya tienes cuenta?</p>
                         <Button
