@@ -55,10 +55,10 @@ html, body, #root {
 }
 
 .auth-card {
-  max-width: 400px;
+  max-width: 320px;
   width: 100%;
   margin: 0 auto;
-  padding: 2.5rem;
+  padding: 1.5rem;
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.15);
   transition: transform 0.3s;
@@ -67,6 +67,11 @@ html, body, #root {
 
 .auth-card:hover {
   transform: translateY(-5px);
+}
+
+/* Desactiva el efecto hover cuando se use la clase no-hover */
+.no-hover:hover {
+  transform: none !important;
 }
 
 .p-inputtext, .p-password input {

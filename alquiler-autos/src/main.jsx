@@ -1,12 +1,19 @@
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ToastProvider } from "./contexts/ToastContext";
 import App from "./App";
+import "primereact/resources/themes/lara-light-blue/theme.css";
+import "primereact/resources/primereact.min.css";
+import "primeicons/primeicons.css";
+import "./App.css";
 
 createRoot(document.getElementById("root")).render(
   <AuthProvider>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <ToastProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ToastProvider>
   </AuthProvider>
 );
