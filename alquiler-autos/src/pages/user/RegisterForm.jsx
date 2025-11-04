@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState, useMemo, useCallback } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
 import { UserContext } from "../../contexts/UserContext";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -13,11 +13,15 @@ import { useToast } from "../../contexts/ToastContext";
 
 export default function RegisterForm() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { showToast } = useToast();
   const { id } = useParams();
 
   const { user } = useContext(AuthContext);
   const { roles, registerUser, editUser, getUserById } = useContext(UserContext);
+  
+  // Obtener datos del usuario desde el state de navegación
+  const userDataFromState = location.state?.userData;
 
   const isAdmin = user?.rol === "admin";
   const isEdit = Boolean(id);
@@ -52,7 +56,20 @@ export default function RegisterForm() {
   const loadUserData = useCallback(async () => {
     if (!isEdit || !id) return;
     
-    console.log("[API] Cargando datos del usuario - solo debería ejecutarse una vez al montar en modo edición");
+    // Si tenemos datos del state, usarlos directamente (sin hacer petición al backend)
+    if (userDataFromState) {
+      setInitialValues({
+        nombre: userDataFromState.nombre || "",
+        correo: userDataFromState.correo || userDataFromState.email || "",
+        password: "",
+        confirmPassword: "",
+        rol: userDataFromState.rol || ""
+      });
+      return;
+    }
+    
+    // Si no hay datos en el state, hacer petición al backend (fallback)
+    console.log("[API] Cargando datos del usuario desde backend");
     const userData = await getUserById(Number(id));
     if (userData) {
       setInitialValues({
@@ -63,7 +80,7 @@ export default function RegisterForm() {
         rol: userData.rol || ""
       });
     }
-  }, [id, isEdit, getUserById]);
+  }, [id, isEdit, getUserById, userDataFromState]);
 
   useEffect(() => {
     loadUserData();
@@ -86,8 +103,13 @@ export default function RegisterForm() {
       nombre: values.nombre,
       correo: values.correo,
       ...(values.password && { password: values.password }),
-      rol: isAdmin && values.rol ? values.rol : undefined,
     };
+    
+    // Incluir rol solo si es admin y hay un valor
+    // (El backend no debería permitir que no-admins cambien roles)
+    if (isAdmin && values.rol) {
+      payload.rol = values.rol;
+    }
 
     let result;
     if (isEdit) {
@@ -104,7 +126,7 @@ export default function RegisterForm() {
         detail: message, 
         life: 2000 
       });
-      navigate(isEdit ? "/usuarios" : "/");
+      navigate(isEdit ? "/user/list" : "/");
     } else {
       showToast({ severity: "error", summary: "Error", detail: message, life: 3000 });
       setFieldError("correo", message || (isEdit ? "Error al actualizar" : "Error en el registro"));

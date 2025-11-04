@@ -9,7 +9,7 @@ export const userService = {
 
     register: (config) => api.post("register", config),
 
-    list: (config) => api.get("/", config),
+    list: (config) => api.get("", config),
 
     roles: (config) => api.get("roles", config),
 };

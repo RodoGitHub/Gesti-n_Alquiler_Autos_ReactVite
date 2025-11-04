@@ -33,10 +33,24 @@ export default function Home() {
                 <h2 style={{ marginTop: 0 }}>Inicio</h2>
                 <h3 style={{ marginTop: 0 }}>Hola: {user.nombre}</h3>
                 <p> {user.correo}</p>
-                <p>Estas conectado como: {user.rol}</p>
+                
+                <div style={{ display: "flex", gap: 12, justifyContent: "center", width: "100%", marginBottom: "1rem" }}>
+                    <Button label="Lista de Usuarios" icon="pi pi-users" className="p-button-info" onClick={() => navigate('/user/list')} />
+                </div>
                 
                 <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
                     <Button label="Cerrar sesión" icon="pi pi-sign-out" className="p-button-danger" onClick={() => signOut()} />
+                </div>
+                
+                <p style={{ marginTop: "2.5rem", marginBottom: 0 }}>Estas conectado como: {user.rol}</p>
+                <div style={{ marginTop: "1rem", borderTop: "1px solid #dee2e6", paddingTop: "1rem" }}>
+                    <Button 
+                        label="Sobre Nosotros" 
+                        icon="pi pi-info-circle"
+                        className="p-button-text p-button-secondary"
+                        onClick={() => navigate('/about')}
+                        style={{ fontSize: "0.9rem" }}
+                    />
                 </div>
             </Card>
         </div>

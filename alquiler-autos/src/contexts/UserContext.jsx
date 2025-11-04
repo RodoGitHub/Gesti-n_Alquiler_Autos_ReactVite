@@ -22,10 +22,37 @@ export const UserProvider = ({children}) =>{
         try {
             const res = await userService.list();
             const data = res?.data?.data;
-            setUsers(Array.isArray(data) ? data : []);
+            // Filtrar solo usuarios activos (is_active === true)
+            const filteredData = Array.isArray(data) 
+                ? data.filter(user => user.is_active === true)
+                : [];
+            setUsers(filteredData);
+            const ok = res.status === 200 || res.status === 201;
+            const msg = res?.message || (ok ? "Usuarios obtenidos correctamente." : "Error al obtener usuarios.");
+            return { ok, message: msg };
         } catch (err) {
             console.error("Error al obtener usuarios:", err);
             setUsers([]);
+            const msg = err?.response?.data?.message || err?.message || "Error al obtener usuarios.";
+            return { ok: false, message: msg };
+        }
+    };
+
+    const deleteUser = async (id) => {
+        try {
+            const res = await userService.delete(id);
+            const ok = res.status === 200 || res.status === 201 || res.status === 204;
+            const msg = res?.message || (ok ? "Usuario eliminado correctamente." : "Error al eliminar el usuario.");
+            
+            if (ok) {
+                await fetchUsers();
+            }
+            
+            return { ok, message: msg };
+        } catch (err) {
+            console.error("Error al eliminar usuario:", err);
+            const msg = err?.response?.data?.message || err?.message || "Error al eliminar el usuario.";
+            return { ok: false, message: msg };
         }
     };
 
@@ -52,7 +79,9 @@ export const UserProvider = ({children}) =>{
 
     const editUser = async (id, { nombre, correo, password, rol }) => {
         try {
-            const payload = { nombre, correo, ...(password && { password }), rol };
+            const payload = { nombre, correo };
+            if (password) payload.password = password;
+            if (rol !== undefined) payload.rol = rol;
             const res = await userService.update(id, payload);
 
             const ok = res.status === 200 || res.status === 201;
@@ -84,6 +113,7 @@ export const UserProvider = ({children}) =>{
         registerUser,
         editUser,
         fetchUsers,
+        deleteUser,
         getUserById
     }),[roles, users]);
 
