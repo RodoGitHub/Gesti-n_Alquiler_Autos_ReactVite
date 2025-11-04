@@ -32,9 +32,9 @@ export default function Home() {
             <Card className="auth-card no-hover" style={{ maxWidth: 520, width: "100%", textAlign: "center", margin: "0 auto" }}>
                 <h2 style={{ marginTop: 0 }}>Inicio</h2>
                 <h3 style={{ marginTop: 0 }}>Hola: {user.nombre}</h3>
-                <p>Usuario logueado: {user.correo}</p>
-                <p>Rol: {user.rol}</p>
-                <p>Status: {status}</p>
+                <p> {user.correo}</p>
+                <p>Estas conectado como: {user.rol}</p>
+                
                 <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
                     <Button label="Cerrar sesión" icon="pi pi-sign-out" className="p-button-danger" onClick={() => signOut()} />
                 </div>

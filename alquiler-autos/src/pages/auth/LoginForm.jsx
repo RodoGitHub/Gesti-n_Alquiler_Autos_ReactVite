@@ -21,7 +21,7 @@ export default function LoginForm() {
 
   const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
     const { correo, password } = values;
-    const { ok, message } = await signIn({ correo, password });
+    const { ok, message } = await signIn({ correo, password }); // 👈 CAMBIO CLAVE
     if (ok) {
       showToast({ severity: "success", summary: "Éxito", detail: message, life: 2000 });
       navigate("/");
@@ -35,9 +35,9 @@ export default function LoginForm() {
   return (
     <div className="auth-hero">
       <div className="auth-hero-left">
-        <h1>Gestion de autos</h1>
-        <h2>bienvenido de nuevo</h2>
-        <p>ingresa tus credenciales</p>
+        <h1>Gestión de autos</h1>
+        <h2>Bienvenido de nuevo</h2>
+        <p>Ingresá tus credenciales</p>
       </div>
       <div className="auth-hero-right">
         <Card className="auth-card no-hover">
@@ -53,7 +53,12 @@ export default function LoginForm() {
                   <label htmlFor="correo">Correo</label>
                   <Field name="correo">
                     {({ field }) => (
-                      <InputText id="correo" {...field} placeholder="correo@dominio.com" className={touched.correo && errors.correo ? "p-invalid" : ""} />
+                      <InputText
+                        id="correo"
+                        {...field}
+                        placeholder="correo@dominio.com"
+                        className={touched.correo && errors.correo ? "p-invalid" : ""}
+                      />
                     )}
                   </Field>
                   <small className="p-error">
@@ -65,7 +70,14 @@ export default function LoginForm() {
                   <label htmlFor="password">Contraseña</label>
                   <Field name="password">
                     {({ field }) => (
-                      <Password id="password" {...field} feedback={false} toggleMask placeholder="••••••" inputClassName={touched.password && errors.password ? "p-invalid" : ""} />
+                      <Password
+                        id="password"
+                        {...field}
+                        feedback={false}
+                        toggleMask
+                        placeholder="••••••"
+                        inputClassName={touched.password && errors.password ? "p-invalid" : ""}
+                      />
                     )}
                   </Field>
                   <small className="p-error">
@@ -73,15 +85,31 @@ export default function LoginForm() {
                   </small>
                 </div>
 
-                <Button type="submit" label="Entrar" className="p-button-primary" loading={isSubmitting} icon="pi pi-sign-in" />
+                <Button
+                  type="submit"
+                  label="Entrar"
+                  className="p-button-primary"
+                  loading={isSubmitting}
+                  icon="pi pi-sign-in"
+                />
 
                 <div style={{ textAlign: "center" }}>
-                  <span>no tenes cuenta? </span>
-                  <Button type="button" label="presiona aqui!" className="p-button-text" onClick={() => navigate('/user/register')} />
+                  <span>¿No tenés cuenta? </span>
+                  <Button
+                    type="button"
+                    label="¡Presioná aquí!"
+                    className="p-button-text"
+                    onClick={() => navigate("/user/register")}
+                  />
                 </div>
 
                 <div style={{ textAlign: "center" }}>
-                  <Button type="button" label="Sobre nosotros" className="p-button-text p-button-sm" onClick={() => navigate('/about')} />
+                  <Button
+                    type="button"
+                    label="Sobre nosotros"
+                    className="p-button-text p-button-sm"
+                    onClick={() => navigate("/about")}
+                  />
                 </div>
               </Form>
             )}

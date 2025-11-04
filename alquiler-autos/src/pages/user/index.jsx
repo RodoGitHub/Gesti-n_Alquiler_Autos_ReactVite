@@ -4,7 +4,8 @@ import RegisterForm from "./RegisterForm";
 const UserRoutes = () => {
     return (
         <Routes>
-            <Route path="register" element={<RegisterForm />} /> 
+            <Route path="register" element={<RegisterForm />} />
+            <Route path=":id" element={<RegisterForm />} />
         </Routes>
     );
 };
