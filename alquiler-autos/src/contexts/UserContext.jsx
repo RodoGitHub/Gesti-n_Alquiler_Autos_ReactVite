@@ -5,6 +5,7 @@ export const UserContext = createContext()
 export const UserProvider = ({children}) =>{
   
     const [roles, setRoles] = useState([]);
+    const [users, setUsers] = useState([])
 
     const fetchRoles = async () => {
         try {
@@ -36,12 +37,67 @@ export const UserProvider = ({children}) =>{
 
             return { ok: false, message: msg };
         }
-        };
+    };
+
+    const fetchUser = async () => {
+        try {
+            const res = await userService.list();
+            const ok = res.status === 200 || res.status === 201;
+            const msg = res?.message || (ok ? "Lista de usuarios exitosa" : "Error al consultar usuarios.");
+            console.log(res.data)
+            if (ok && res?.data?.data) {
+                setUsers(res.data.data.filter(user => user.is_active));
+
+            }
+            return { ok, message: msg};
+        } catch (err) {
+            console.error("Error al consultar usuarios:", err);
+            const msg = err?.response?.data?.message || err?.message || "Error al consultar usuarios.";
+
+            return { ok: false, message: msg };
+        }
+
+    };
+
+    const editUser = async (id, updated) => {
+        try {
+            await userService.update(id, updated);
+            setUsers(prev =>
+                prev.map(u => (u.id === id ? { ...u, ...updated } : u))
+            );
+        } catch (err) {
+            console.error("Error al editar usuario:", err);
+            alert(err?.response?.data?.message || err.message || "Error al editar usuario.");
+        }
+    };
+
+
+    const deleteUser = async (id) => {
+        try {
+            const res = await userService.delete(id);
+            const ok = res.status === 200 || res.status === 204;
+            const message = res.message || (ok ? "Usuario eliminado exitosamente." : "Error al eliminar usuario.");
+            
+            return { ok, message };
+        } catch (err) {
+            console.error("Error al eliminar usuario:", err?.response || err);
+            const message = err?.response?.data?.message || err?.message || "Error al eliminar usuario.";
+            
+            return { ok: false, message };
+        } finally {
+            fetchUser();
+        }
+    };
+
 
     const value = useMemo(() => ({
+        users,
         roles,
+        editUser,
+        deleteUser,
+        fetchUser,
         registerUser
-    }),[roles]);
+    }),[roles,users]);
 
     return (
         <UserContext.Provider value={value}>
