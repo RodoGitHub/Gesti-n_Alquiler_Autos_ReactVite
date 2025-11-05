@@ -26,7 +26,7 @@ export const resource = (basePath, label = "Recurso") => {
     get:    (id, config)       => handle(api.get(`${basePath}/${id}`, config), `${label} obtenido`),
     post:   (path = "", payload, config) => handle(api.post(`${basePath}/${path}`, payload, config), `${label} enviado`),
     create: (payload, config)  => handle(api.post(basePath, payload, config), `${label} creado`),
-    update: (id, payload, config) => handle(api.patch(`${basePath}/${id}`, payload, config), `${label} actualizado`),
+    update: (id, payload, config) => handle(api.put(`${basePath}/${id}`, payload, config), `${label} actualizado`),
     delete: (id, config)       => handle(api.delete(`${basePath}/${id}`, config), `${label} eliminado`),
   };
 };

@@ -1,111 +1,120 @@
 import { createContext, useEffect, useMemo, useState } from "react";
 import { authService } from "../services/auth";
-import { userService } from "../services/user";
 import { AUTH_TYPE } from "../constants/authType";
 
-export const AuthContext = createContext()
-export const AuthProvider = ({children}) =>{
-  const [user, setUser] = useState(null);
-  const [status, setStatus] = useState(AUTH_TYPE.LOADING);
+export const AuthContext = createContext();
 
-  const saveTokens = (data) => {
-    if (!data) return;
-    if (data.token) localStorage.setItem("token", data.token);
-    if (data.access) localStorage.setItem("access", data.access);
-    if (data.refresh) localStorage.setItem("refresh", data.refresh);
-  };
+export const AuthProvider = ({ children }) => {
+    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null);
+    const [status, setStatus] = useState(AUTH_TYPE.LOADING);
 
-  const clearTokens = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("access");
-    localStorage.removeItem("refresh");
-  };
+    const saveTokens = (data) => {
+        if (!data) return;
+        if (data.token) localStorage.setItem("token", data.token);
+        if (data.access) localStorage.setItem("access", data.access);
+        if (data.refresh) localStorage.setItem("refresh", data.refresh);
+    };
 
-  const hasToken = () =>
-    !!(localStorage.getItem("token") || localStorage.getItem("access"));
+    const clearTokens = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
+    };
 
-  const fetchUser = async () => {
-    try {
-      const res = await authService.me();
-      setUser(res.data);
-      setStatus(AUTH_TYPE.AUTH);
-    } catch {
-      clearTokens();
-      setUser(null);;
-      setStatus(AUTH_TYPE.UNAUTH);
-    }
-  };
+    const hasToken = () =>
+        !!(localStorage.getItem("token") || localStorage.getItem("access"));
 
-  useEffect(() => {
-    if (hasToken()) {
-      fetchUser();
-    } else {
-      setStatus(AUTH_TYPE.UNAUTH);
-    }
-  }, []);
+    const fetchUser = async () => {
+        try {
+        const res = await authService.me();
+        setUser(res.data);
+        setStatus(AUTH_TYPE.AUTH);
+        return { ok: true };
+        } catch (e) {
+        clearTokens();
+        setUser(null);
+        setStatus(AUTH_TYPE.UNAUTH);
+        return { ok: false, error: e };
+        }
+    };
 
-  const signIn = async (credentials) => {
-    try {
-      const res = await authService.login(credentials);
-      if (res.status === 200) {
-        saveTokens(res.data);
+    useEffect(() => {
+        const init = async () => {
+        if (!hasToken()) {
+            setStatus(AUTH_TYPE.UNAUTH);
+            setLoading(false);
+            return;
+        }
         await fetchUser();
-        return { ok: true, message: "Inicio de sesión exitoso" };
-      } else {
-        return {
-          ok: false,
-          message: res?.data?.message || "Error al iniciar sesión",
+        setLoading(false);
         };
-      }
-    } catch (err) {
-      console.error("Error al iniciar sesión:", err);
-      return {
-        ok: false,
-        message:
-          err?.response?.data?.message ||
-          err?.message ||
-          "Usuario o contraseña incorrectos",
-      };
-    }
-  };
+        init();
+        
+    }, []);
 
+    const signIn = async (credentials) => {
+        try {
+        const res = await authService.login(credentials);
+        if (res.status === 200) {
+            saveTokens(res.data);
+            await fetchUser();
+            return { ok: true, message: "Inicio de sesión exitoso" };
+        }
+        return { ok: false, message: res?.data?.message || "Error al iniciar sesión" };
+        } catch (err) {
+        return {
+            ok: false,
+            message:
+            err?.response?.data?.message ||
+            err?.message ||
+            "Usuario o contraseña incorrectos",
+        };
+        }
+    };
 
-  const signOut = async () => {
-    try {
-      await authService.logout(); //revisar al final del proyecto
-    } catch {
+    const signOut = async () => {
+        try {
+            await authService.logout(); //revisar al final del proyecto
+        } finally {
+            clearTokens();
+            setUser(null);
+            setStatus(AUTH_TYPE.UNAUTH);
+        }
+    };
 
-    } finally {
-      clearTokens();
-      setUser(null);
-      setStatus(AUTH_TYPE.UNAUTH);
-    }
-  };
+    const refreshSession = async () => {
+        try {
+            const refresh = localStorage.getItem("refresh");
+            if (!refresh) return null;
+            const res = await authService.refresh(refresh);
+            saveTokens(res.data);
+            return res;
+        } catch (e) {
 
-  const refreshSession = async () => {
-    const refresh = localStorage.getItem("refresh");
-    if (!refresh) return;
-    const res = await authService.refresh(refresh);
-    saveTokens(res.data);
-    return res;
-  };
+            clearTokens();
+            setUser(null);
+            setStatus(AUTH_TYPE.UNAUTH);
+            return null;
+        }
+    };
 
-  const value = useMemo(
-    () => ({ 
-      user, 
-      status, 
-      signIn, 
-      signOut, 
-      refreshSession,
-    }),
-    [user, status]
-  );
+    const value = useMemo(
+        () => ({
+            user,
+            status,
+            loading,
+            signIn,
+            signOut,
+            refreshSession,
+            fetchUser,
+        }),
+        [user, status, loading]
+    );
 
-  return (
-    <AuthContext.Provider 
-      value={value}
-    >
-      {children}
-    </AuthContext.Provider>);
-}
-
+    return (
+        <AuthContext.Provider value={value}>
+            {children}
+        </AuthContext.Provider>
+    );
+};

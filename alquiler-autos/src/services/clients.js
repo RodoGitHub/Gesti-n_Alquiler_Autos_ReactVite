@@ -1,7 +1,3 @@
-import { resource } from "./resource";
+import { resource } from "./api";
 
-export const clientsService = resource("clients", "Cliente");
-
-// Ejemplos:
-// clientsService.get(5);
-// clientsService.post("import", { fileId: "xxxx" });
+export const clientService = resource("clients", "Cliente");
