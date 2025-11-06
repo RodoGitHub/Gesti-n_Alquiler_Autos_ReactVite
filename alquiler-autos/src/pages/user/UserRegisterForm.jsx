@@ -11,7 +11,7 @@ import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { useToast } from "../../contexts/ToastContext";
 
-export default function RegisterForm() {
+export default function UserRegisterForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const { showToast } = useToast();

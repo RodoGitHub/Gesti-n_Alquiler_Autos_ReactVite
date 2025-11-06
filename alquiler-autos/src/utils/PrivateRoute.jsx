@@ -1,26 +1,37 @@
 import { useContext } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
+import { AuthContext } from "../contexts/AuthContext";
+import { AUTH_TYPE } from "../constants/authType";
 
-const PrivateRoute = ({ children, roles }) => {
-  const { user, status } = useContext(AuthContext);
-  const location = useLocation();
+const PrivateRoute = ({ children, roles = [] }) => {
+    const { user, status, loading } = useContext(AuthContext);
+    const location = useLocation();
 
-  const LOGIN_PATH = "/auth/login";
+    const LOGIN_PATH = "/auth/login";
 
-  if (status === "loading") {
-    return null; // o spinner global
-  }
-
-  if (status === "authenticated") {
-    if (roles && !roles.some(r => user.roles?.includes(r))) {
-      return <Navigate to="/inicio-sesion" replace state={{ from: location }} />;
+    // Mientras valida sesión
+    if (loading || status === AUTH_TYPE.LOADING) {
+        return null; // Podés reemplazar con <GlobalLoader />
     }
-    return children;
-  }
 
-  // No autenticado
-   return <Navigate to={LOGIN_PATH} replace state={{ from: location }} />;
+    // Usuario autenticado
+    if (status === AUTH_TYPE.AUTH && user) {
+        // Si hay roles requeridos, validar
+        if (roles.length && !roles.includes(user.rol)) {
+            // No tiene permiso -> lo mandamos al inicio
+            return <Navigate to="/" replace />;
+        }
+        return children;
+    }
+
+    // No autenticado → redirigir al login
+    return (
+        <Navigate
+            to={LOGIN_PATH}
+            replace
+            state={{ from: location.pathname + location.search }}
+        />
+    );
 };
 
 export default PrivateRoute;
