@@ -1,4 +1,4 @@
-import { Routes,Router, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { Fragment } from "react";
 
 import PrivateRoute from "./utils/PrivateRoute";
@@ -10,6 +10,7 @@ import AuthRoutes from "./pages/auth";
 import UserRoutes from "./pages/user";
 import HomeRoutes from "./pages/home"; 
 import ClientRoutes from "./pages/client";
+import ClientRegisterForm from "./pages/client/ClientRegisterForm";
 
 function App() {
     return (
@@ -28,10 +29,17 @@ function App() {
                         </UserProvider>
                     }
                 />
-                {/* Rutas privadas */}
-                
-
-                    <Route
+                {/* Ruta pública para registro de clientes (sin autenticación) */}
+                <Route
+                    path="/client/register-public"
+                    element={
+                        <ClientProvider>
+                            <ClientRegisterForm />
+                        </ClientProvider>
+                    }
+                />
+                {/* Rutas privadas de clientes */}
+                <Route
                     path="/client/*"
                     element={
                         <PrivateRoute>            

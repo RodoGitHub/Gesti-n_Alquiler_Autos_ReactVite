@@ -94,16 +94,6 @@ export default function LoginForm() {
                 />
 
                 <div style={{ textAlign: "center" }}>
-                  <span>¿No tenés cuenta? </span>
-                  <Button
-                    type="button"
-                    label="¡Presioná aquí!"
-                    className="p-button-text"
-                    onClick={() => navigate("/user/register")}
-                  />
-                </div>
-
-                <div style={{ textAlign: "center" }}>
                   <Button
                     type="button"
                     label="Sobre nosotros"

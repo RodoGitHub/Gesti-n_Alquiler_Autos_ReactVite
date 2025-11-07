@@ -9,9 +9,15 @@ const ClientRoutes = () => {
             <Route
                 path="register"
                 element={
-                    <RequireRole roles={["admin"]}>
+                    <RequireRole roles={["admin", "cliente"]}>
                         <ClientRegisterForm />
                     </RequireRole>
+                }
+            />
+            <Route
+                path="register-public"
+                element={
+                    <ClientRegisterForm />
                 }
             />
             <Route

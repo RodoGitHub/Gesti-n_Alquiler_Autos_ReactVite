@@ -6,7 +6,7 @@ import UnAuth from "./Unauth";
 const HomeRoutes = () => {
     return (
         <Routes>
-            <Route path="/" element={<Home />} />
+            <Route index element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path="unauth" element={<UnAuth/>} />
         </Routes>

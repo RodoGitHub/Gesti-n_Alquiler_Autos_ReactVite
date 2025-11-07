@@ -13,7 +13,6 @@ export const UserProvider = ({children}) =>{
             const data = res?.data?.data 
             setRoles(Array.isArray(data) ? data : []);
         } catch (err) {
-            console.error("Error al obtener roles:", err);
             setRoles([]); 
         }
     };
@@ -31,7 +30,6 @@ export const UserProvider = ({children}) =>{
             const msg = res?.message || (ok ? "Usuarios obtenidos correctamente." : "Error al obtener usuarios.");
             return { ok, message: msg };
         } catch (err) {
-            console.error("Error al obtener usuarios:", err);
             setUsers([]);
             const msg = err?.response?.data?.message || err?.message || "Error al obtener usuarios.";
             return { ok: false, message: msg };
@@ -50,7 +48,6 @@ export const UserProvider = ({children}) =>{
             
             return { ok, message: msg };
         } catch (err) {
-            console.error("Error al eliminar usuario:", err);
             const msg = err?.response?.data?.message || err?.message || "Error al eliminar el usuario.";
             return { ok: false, message: msg };
         }
@@ -60,9 +57,9 @@ export const UserProvider = ({children}) =>{
         fetchRoles();
     }, []); 
 
-    const registerUser = async ({ nombre, correo, password, rol }) => {
+    const registerUser = async ({ nombre, apellido, documento, correo, telefono, password, rol, is_active }) => {
         try {
-            const payload = { nombre, correo, password, rol };
+            const payload = { nombre, apellido, documento, correo, telefono, password, rol, is_active };
             const res = await userService.register(payload);
 
             const ok = res.status === 200 || res.status === 201;
@@ -70,18 +67,18 @@ export const UserProvider = ({children}) =>{
 
             return { ok, message: msg, data: res?.data };
         } catch (err) {
-            console.error("Error al registrar usuario:", err);
             const msg = err?.response?.data?.message || err?.message || "Error al registrar el usuario.";
 
             return { ok: false, message: msg };
         }
     };
 
-    const editUser = async (id, { nombre, correo, password, rol }) => {
+    const editUser = async (id, { nombre, correo, password, rol, is_active }) => {
         try {
             const payload = { nombre, correo };
             if (password) payload.password = password;
             if (rol !== undefined) payload.rol = rol;
+            if (is_active !== undefined) payload.is_active = is_active;
             const res = await userService.update(id, payload);
 
             const ok = res.status === 200 || res.status === 201;
@@ -89,7 +86,6 @@ export const UserProvider = ({children}) =>{
 
             return { ok, message: msg, data: res?.data };
         } catch (err) {
-            console.error("Error al actualizar usuario:", err);
             const msg = err?.response?.data?.message || err?.message || "Error al actualizar el usuario.";
 
             return { ok: false, message: msg };
@@ -98,11 +94,9 @@ export const UserProvider = ({children}) =>{
 
     const getUserById = async (id) => {
         try {
-            console.log(`[API CALL] getUserById(${id}) - Verifica en Network tab que solo se ejecuta cuando editas`);
             const res = await userService.get(id);
             return res?.data?.data || null;
         } catch (err) {
-            console.error("Error al obtener usuario:", err);
             return null;
         }
     };

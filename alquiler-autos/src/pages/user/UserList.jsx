@@ -6,6 +6,7 @@ import { Card } from "primereact/card";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
+import { Tag } from "primereact/tag";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
 export default function UserList() {
@@ -18,11 +19,13 @@ export default function UserList() {
         const loadUsers = async () => {
             setLoading(true);
             const { ok, message } = await fetchUsers();
-            showToast({
-                severity: ok ? "success" : "error",
-                summary: ok ? "Éxito" : "Error",
-                detail: message
-            });
+            if (!ok) {
+                showToast({
+                    severity: "error",
+                    summary: "Error",
+                    detail: message
+                });
+            }
             setLoading(false);
         };
 
@@ -31,7 +34,7 @@ export default function UserList() {
     }, []);
 
     const handleEdit = (userData) => {
-        navigate(`/user/${userData.id}`, { state: { userData } });
+        navigate(`/user/edit/${userData.id}`, { state: { userData } });
     };
 
     const handleDelete = async (id) => {
@@ -83,28 +86,15 @@ export default function UserList() {
     };
 
     const rolBodyTemplate = (rowData) => {
-        const getRolBadgeStyle = (rol) => {
-            const styles = {
-                admin: { backgroundColor: "#EF4444", color: "white" },
-                empleado: { backgroundColor: "#3B82F6", color: "white" },
-                cliente: { backgroundColor: "#10B981", color: "white" }
-            };
-            return styles[rol?.toLowerCase()] || { backgroundColor: "#6B7280", color: "white" };
+        const getRolSeverity = (rol) => {
+            const rolLower = rol?.toLowerCase();
+            if (rolLower === "admin") return "danger";
+            if (rolLower === "empleado") return "info";
+            if (rolLower === "cliente") return "success";
+            return null;
         };
 
-        return (
-            <span
-                style={{
-                    padding: "0.25rem 0.75rem",
-                    borderRadius: "12px",
-                    fontSize: "0.875rem",
-                    fontWeight: "500",
-                    ...getRolBadgeStyle(rowData.rol)
-                }}
-            >
-                {rowData.rol}
-            </span>
-        );
+        return <Tag value={rowData.rol} severity={getRolSeverity(rowData.rol)} />;
     };
 
     return (
@@ -115,7 +105,7 @@ export default function UserList() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center"
-        }}>
+        }} className="user-list-container">
             <Card 
                 style={{ 
                     width: "100%", 
@@ -175,6 +165,15 @@ export default function UserList() {
                         style={{ width: "120px", textAlign: "center" }}
                     />
                 </DataTable>
+                <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "flex-end" }}>
+                    <Button 
+                        type="button" 
+                        label="Volver" 
+                        icon="pi pi-arrow-left" 
+                        className="p-button-text p-button-sm" 
+                        onClick={() => navigate(-1)}
+                    />
+                </div>
             </Card>
             <ConfirmDialog />
         </div>

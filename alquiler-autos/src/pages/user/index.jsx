@@ -1,12 +1,12 @@
 import { Routes, Route } from "react-router-dom";
-import RegisterForm from "./RegisterForm";
-import UserList from "./ListUser";
+import UserRegisterForm from "./UserRegisterForm";
+import UserList from "./UserList";
 
 const UserRoutes = () => {
     return (
         <Routes>
-            <Route path="register" element={<RegisterForm />} /> 
-            <Route path="edit/:id" element={<RegisterForm />} /> 
+            <Route path="register" element={<UserRegisterForm />} /> 
+            <Route path="edit/:id" element={<UserRegisterForm />} /> 
             <Route path="list" element={<UserList />}/>
         </Routes>
     );

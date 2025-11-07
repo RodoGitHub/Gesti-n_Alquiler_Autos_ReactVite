@@ -14,13 +14,12 @@ export default function Home() {
 
     if (!user) {
         return (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", padding: 16, backgroundColor: "#0D3B66" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", padding: 16, backgroundColor: "#0D3B66" }} className="home-container">
                 <Card className="auth-card no-hover" style={{ maxWidth: 520, width: "100%", textAlign: "center", margin: "0 auto" }}>
                     <h2 style={{ marginTop: 0 }}>Bienvenido</h2>
                     <p style={{ marginTop: 0 }}>No hay usuario logueado.</p>
-                    <div style={{ display: "flex", gap: 12, justifyContent: "center", width: "100%" }}>
+                    <div style={{ display: "flex", gap: 12, justifyContent: "center", width: "100%", marginBottom: "1rem", flexWrap: "wrap" }}>
                         <Button label="Iniciar sesión" icon="pi pi-sign-in" className="p-button-primary" onClick={() => navigate('/auth/login')} />
-                        <Button label="Crear cuenta" icon="pi pi-user-plus" className="p-button-secondary" onClick={() => navigate('/user/register')} />
                     </div>
                 </Card>
             </div>
@@ -34,9 +33,18 @@ export default function Home() {
                 <h3 style={{ marginTop: 0 }}>Hola: {user.nombre}</h3>
                 <p> {user.correo}</p>
                 
-                <div style={{ display: "flex", gap: 12, justifyContent: "center", width: "100%", marginBottom: "1rem" }}>
-                    <Button label="Lista de Usuarios" icon="pi pi-users" className="p-button-info" onClick={() => navigate('/user/list')} />
+                <div style={{ display: "flex", gap: 12, justifyContent: "center", width: "100%", marginBottom: "1rem", flexWrap: "wrap" }}>
+                    {user?.rol === "admin" && (
+                        <Button label="Lista de Usuarios" icon="pi pi-users" className="p-button-info" onClick={() => navigate('/user/list')} />
+                    )}
+                    <Button label="Lista de Clientes" icon="pi pi-users" className="p-button-success" onClick={() => navigate('/client/list')} />
                 </div>
+                
+                {user?.rol === "admin" && (
+                    <div style={{ display: "flex", gap: 12, justifyContent: "center", width: "100%", marginBottom: "1rem", flexWrap: "wrap" }}>
+                        <Button label="Registrar Cliente" icon="pi pi-user-plus" className="p-button-warning" onClick={() => navigate('/client/register')} />
+                    </div>
+                )}
                 
                 <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
                     <Button label="Cerrar sesión" icon="pi pi-sign-out" className="p-button-danger" onClick={() => signOut()} />

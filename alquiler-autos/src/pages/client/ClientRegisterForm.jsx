@@ -1,106 +1,263 @@
-import { useContext, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState, useMemo, useCallback } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { ClientContext } from "../../contexts/ClientContext";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { Card } from "primereact/card";
+import { InputText } from "primereact/inputtext";
+import { Button } from "primereact/button";
+import { InputSwitch } from "primereact/inputswitch";
+import { useToast } from "../../contexts/ToastContext";
 
-export default function ClientRegisterForm() { 
-    const { registerClient } = useContext(ClientContext);
-    const navigate = useNavigate();
+export default function ClientRegisterForm() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { showToast } = useToast();
+  const { id } = useParams();
 
-    const nombreRef = useRef(null);
-    const apellidoRef = useRef(null);
-    const documentoRef = useRef(null);
-    const correoRef = useRef(null);
-    const telefonoRef = useRef(null);
+  const { registerClient, editClient, getClient } = useContext(ClientContext);
+  
+  const clientDataFromState = location.state?.clientData;
+  const isEdit = Boolean(id);
 
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
+  const [initialValues, setInitialValues] = useState({
+    nombre: "",
+    apellido: "",
+    documento: "",
+    correo: "",
+    telefono: "",
+    is_active: true
+  });
 
-    const onlyDigits = (s) => (s || "").replace(/\D+/g, "");
+  const validationSchema = useMemo(() => {
+    return Yup.object({
+      nombre: Yup.string().required("Nombre requerido"),
+      apellido: Yup.string().required("Apellido requerido"),
+      documento: Yup.string()
+        .required("Documento requerido")
+        .matches(/^\d+$/, "El documento solo debe contener números"),
+      correo: Yup.string().email("Correo inválido"),
+      telefono: Yup.string().matches(/^\d*$/, "El teléfono solo debe contener números")
+    });
+  }, []);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError("");
+  const loadClientData = useCallback(async () => {
+    if (!isEdit || !id) return;
+    
+    if (clientDataFromState) {
+      setInitialValues({
+        nombre: clientDataFromState.nombre || "",
+        apellido: clientDataFromState.apellido || "",
+        documento: clientDataFromState.documento || "",
+        correo: clientDataFromState.correo || "",
+        telefono: clientDataFromState.telefono || "",
+        is_active: clientDataFromState.is_active !== undefined ? clientDataFromState.is_active : true
+      });
+      return;
+    }
+    
+    const { ok, data } = await getClient(Number(id));
+    if (ok && data) {
+      setInitialValues({
+        nombre: data.nombre || "",
+        apellido: data.apellido || "",
+        documento: data.documento || "",
+        correo: data.correo || "",
+        telefono: data.telefono || "",
+        is_active: data.is_active !== undefined ? data.is_active : true
+      });
+    }
+  }, [id, isEdit, getClient, clientDataFromState]);
 
-        const payload = {
-        nombre: (nombreRef.current?.value || "").trim(),
-        apellido: (apellidoRef.current?.value || "").trim(),
-        documento: onlyDigits(documentoRef.current?.value),
-        correo: (correoRef.current?.value || "").trim(),
-        telefono: onlyDigits(telefonoRef.current?.value),
-        };
+  useEffect(() => {
+    loadClientData();
+  }, [loadClientData]);
 
-        if (!payload.nombre || !payload.apellido || !payload.documento) {
-        setError("Nombre, apellido y documento son obligatorios.");
-        return;
-        }
-
-        try {
-        setLoading(true);
-        const { ok, message } = await registerClient(payload);
-        if (!ok) {
-            setError(message || "No se pudo registrar el cliente.");
-            return;
-        }
-        
-        navigate("/clients");
-        } catch (err) {
-        setError(err?.message || "Error inesperado.");
-        } finally {
-        setLoading(false);
-        }
+  const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
+    const payload = {
+      nombre: values.nombre.trim(),
+      apellido: values.apellido.trim(),
+      documento: values.documento,
+      ...(values.correo && { correo: values.correo.trim() }),
+      ...(values.telefono && { telefono: values.telefono }),
+      is_active: values.is_active !== undefined ? values.is_active : true
     };
 
-    return (
-        <form onSubmit={handleSubmit} style={{ maxWidth: 420, margin: "60px auto" }}>
-            <h2>Registrar Cliente</h2>
+    let result;
+    if (isEdit) {
+      result = await editClient(Number(id), payload);
+    } else {
+      result = await registerClient(payload);
+    }
 
-            <div className="mb-3">
-                <label className="form-label">Nombre *</label>
-                <input ref={nombreRef} className="form-control" placeholder="Juan" />
-            </div>
+    const { ok, message } = result;
+    if (ok) {
+      showToast({ 
+        severity: "success", 
+        summary: isEdit ? "Actualizado" : "Registrado", 
+        detail: message, 
+        life: 2000 
+      });
+      navigate("/client/list");
+    } else {
+      showToast({ severity: "error", summary: "Error", detail: message, life: 3000 });
+      setFieldError("documento", message || (isEdit ? "Error al actualizar" : "Error en el registro"));
+    }
+    setSubmitting(false);
+  };
 
-            <div className="mb-3">
-                <label className="form-label">Apellido *</label>
-                <input ref={apellidoRef} className="form-control" placeholder="Pérez" />
-            </div>
+  return (
+    <div className="auth-hero">
+      <div className="auth-hero-left">
+        <h1>Gestión de Autos</h1>
+        <h2>{isEdit ? "Editar cliente" : "Registrar cliente"}</h2>
+        <p>{isEdit ? "Modifica los datos del cliente" : "Completa el formulario para registrar un cliente"}</p>
+      </div>
+      <div className="auth-hero-right">
+        <Card className="auth-card no-hover" pt={{
+          root: { style: { padding: "1rem", maxHeight: "calc(100vh - 4rem)" } },
+          body: { style: { overflow: "auto", display: "flex", flexDirection: "column" } }
+        }}>
+          <h2 style={{ marginBottom: "0.5rem" }}>{isEdit ? "Editar Cliente" : "Registro de Cliente"}</h2>
+          <Formik
+            initialValues={initialValues}
+            enableReinitialize
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+            validateOnChange={false}
+            validateOnBlur={true}
+          >
+            {({ isSubmitting, errors, touched, values, setFieldValue }) => (
+              <Form className="p-fluid" pt={{ root: { style: { display: "flex", flexDirection: "column", gap: "0.3rem" } } }}>
+                <div className="p-field" style={{ marginBottom: "0.3rem" }}>
+                  <label htmlFor="nombre" style={{ marginBottom: "0.25rem" }}>Nombre *</label>
+                  <Field name="nombre">
+                    {({ field }) => (
+                      <InputText 
+                        id="nombre" 
+                        {...field} 
+                        placeholder="" 
+                        className={touched.nombre && errors.nombre ? "p-invalid" : ""}
+                        pt={{ root: { style: { padding: "0.5rem" } } }}
+                      />
+                    )}
+                  </Field>
+                  <small className="p-error"><ErrorMessage name="nombre" /></small>
+                </div>
 
-            <div className="mb-3">
-                <label className="form-label">Documento (DNI) *</label>
-                <input
-                ref={documentoRef}
-                className="form-control"
-                placeholder="30123456"
-                inputMode="numeric"
-                onInput={(e) => (e.target.value = onlyDigits(e.target.value))}
+                <div className="p-field" style={{ marginBottom: "0.3rem" }}>
+                  <label htmlFor="apellido" style={{ marginBottom: "0.25rem" }}>Apellido *</label>
+                  <Field name="apellido">
+                    {({ field }) => (
+                      <InputText 
+                        id="apellido" 
+                        {...field} 
+                        placeholder="" 
+                        className={touched.apellido && errors.apellido ? "p-invalid" : ""}
+                        pt={{ root: { style: { padding: "0.5rem" } } }}
+                      />
+                    )}
+                  </Field>
+                  <small className="p-error"><ErrorMessage name="apellido" /></small>
+                </div>
+
+                <div className="p-field" style={{ marginBottom: "0.3rem" }}>
+                  <label htmlFor="documento" style={{ marginBottom: "0.25rem" }}>Documento (DNI) *</label>
+                  <Field name="documento">
+                    {({ field }) => (
+                      <InputText 
+                        id="documento" 
+                        {...field} 
+                        placeholder=""
+                        inputMode="numeric"
+                        onInput={(e) => {
+                          const value = e.target.value.replace(/\D+/g, "");
+                          setFieldValue("documento", value);
+                        }}
+                        className={touched.documento && errors.documento ? "p-invalid" : ""}
+                        pt={{ root: { style: { padding: "0.5rem" } } }}
+                      />
+                    )}
+                  </Field>
+                  <small className="p-error"><ErrorMessage name="documento" /></small>
+                </div>
+
+                <div className="p-field" style={{ marginBottom: "0.3rem" }}>
+                  <label htmlFor="correo" style={{ marginBottom: "0.25rem" }}>Correo</label>
+                  <Field name="correo">
+                    {({ field }) => (
+                      <InputText 
+                        id="correo" 
+                        {...field} 
+                        type="email"
+                        placeholder="" 
+                        className={touched.correo && errors.correo ? "p-invalid" : ""}
+                        pt={{ root: { style: { padding: "0.5rem" } } }}
+                      />
+                    )}
+                  </Field>
+                  <small className="p-error"><ErrorMessage name="correo" /></small>
+                </div>
+
+                <div className="p-field" style={{ marginBottom: "0.3rem" }}>
+                  <label htmlFor="telefono" style={{ marginBottom: "0.25rem" }}>Teléfono</label>
+                  <Field name="telefono">
+                    {({ field }) => (
+                      <InputText 
+                        id="telefono" 
+                        {...field} 
+                        placeholder=""
+                        inputMode="numeric"
+                        onInput={(e) => {
+                          const value = e.target.value.replace(/\D+/g, "");
+                          setFieldValue("telefono", value);
+                        }}
+                        className={touched.telefono && errors.telefono ? "p-invalid" : ""}
+                        pt={{ root: { style: { padding: "0.5rem" } } }}
+                      />
+                    )}
+                  </Field>
+                  <small className="p-error"><ErrorMessage name="telefono" /></small>
+                </div>
+
+                <div className="p-field" style={{ marginBottom: "0.3rem" }}>
+                  <label htmlFor="is_active" style={{ marginBottom: "0.25rem" }}>Cliente activo</label>
+                  <Field name="is_active">
+                    {({ field }) => (
+                      <InputSwitch 
+                        id="is_active" 
+                        checked={field.value}
+                        onChange={(e) => setFieldValue("is_active", e.value)}
+                        pt={{ root: { style: { marginTop: "0.25rem" } } }}
+                      />
+                    )}
+                  </Field>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  label={isEdit ? "Actualizar" : "Registrar"} 
+                  className="p-button-primary" 
+                  loading={isSubmitting} 
+                  icon={isEdit ? "pi pi-check" : "pi pi-user-plus"}
+                  pt={{ root: { style: { marginTop: "0.5rem", padding: "0.5rem" } } }}
                 />
-            </div>
 
-            <div className="mb-3">
-                <label className="form-label">Correo</label>
-                <input ref={correoRef} type="email" className="form-control" placeholder="correo@ejemplo.com" />
-            </div>
-
-            <div className="mb-3">
-                <label className="form-label">Teléfono</label>
-                <input
-                ref={telefonoRef}
-                className="form-control"
-                placeholder="3512345678"
-                inputMode="numeric"
-                onInput={(e) => (e.target.value = onlyDigits(e.target.value))}
-                />
-            </div>
-
-            {error && <div className="alert alert-danger">{error}</div>}
-
-            <div className="d-flex gap-2">
-                <button className="btn btn-primary" type="submit" disabled={loading}>
-                {loading ? "Guardando..." : "Registrar"}
-                </button>
-                <button type="button" className="btn btn-secondary" onClick={() => navigate(-1)} disabled={loading}>
-                Cancelar
-                </button>
-            </div>
-        </form>
-    );
+                <div style={{ marginTop: "0.25rem", display: "flex", justifyContent: "center" }}>
+                  <Button 
+                    type="button" 
+                    label="Volver" 
+                    icon="pi pi-arrow-left" 
+                    className="p-button-text p-button-sm" 
+                    onClick={() => navigate(-1)}
+                    style={{ fontSize: "0.9rem" }}
+                  />
+                </div>
+              </Form>
+            )}
+          </Formik>
+        </Card>
+      </div>
+    </div>
+  );
 }

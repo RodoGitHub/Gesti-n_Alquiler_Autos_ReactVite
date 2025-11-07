@@ -9,6 +9,7 @@ import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
+import { InputSwitch } from "primereact/inputswitch";
 import { useToast } from "../../contexts/ToastContext";
 
 export default function UserRegisterForm() {
@@ -28,25 +29,35 @@ export default function UserRegisterForm() {
 
   const [initialValues, setInitialValues] = useState({
     nombre: "",
+    apellido: "",
+    documento: "",
     correo: "",
+    telefono: "",
     password: "",
     confirmPassword: "",
-    rol: ""
+    rol: "",
+    is_active: true
   });
 
   const validationSchema = useMemo(() => {
-    console.log("[VALIDATION] Schema recreado - solo debería pasar cuando cambia isEdit o isAdmin");
     return Yup.object({
       nombre: Yup.string().required("Nombre requerido"),
+      ...(!isEdit && {
+        apellido: Yup.string().required("Apellido requerido"),
+        documento: Yup.string()
+          .required("Documento requerido")
+          .matches(/^\d+$/, "El documento solo debe contener números"),
+        telefono: Yup.string().matches(/^\d*$/, "El teléfono solo debe contener números"),
+      }),
       correo: Yup.string().email("Correo inválido").required("Correo requerido"),
       password: isEdit 
         ? Yup.string().min(6, "Mínimo 6 caracteres")
         : Yup.string().min(6, "Mínimo 6 caracteres").required("Contraseña requerida"),
-      confirmPassword: isEdit
-        ? Yup.string().oneOf([Yup.ref("password")], "Las contraseñas no coinciden")
-        : Yup.string()
-            .oneOf([Yup.ref("password")], "Las contraseñas no coinciden")
-            .required("Confirmación requerida"),
+      ...(!isEdit && {
+        confirmPassword: Yup.string()
+          .oneOf([Yup.ref("password")], "Las contraseñas no coinciden")
+          .required("Confirmación requerida"),
+      }),
       rol: isAdmin 
         ? Yup.string().required("Rol requerido")
         : Yup.string()
@@ -60,24 +71,31 @@ export default function UserRegisterForm() {
     if (userDataFromState) {
       setInitialValues({
         nombre: userDataFromState.nombre || "",
+        apellido: userDataFromState.apellido || "",
+        documento: userDataFromState.documento || "",
         correo: userDataFromState.correo || userDataFromState.email || "",
+        telefono: userDataFromState.telefono || "",
         password: "",
         confirmPassword: "",
-        rol: userDataFromState.rol || ""
+        rol: userDataFromState.rol || "",
+        is_active: userDataFromState.is_active !== undefined ? userDataFromState.is_active : true
       });
       return;
     }
     
     // Si no hay datos en el state, hacer petición al backend (fallback)
-    console.log("[API] Cargando datos del usuario desde backend");
     const userData = await getUserById(Number(id));
     if (userData) {
       setInitialValues({
         nombre: userData.nombre || "",
+        apellido: userData.apellido || "",
+        documento: userData.documento || "",
         correo: userData.correo || userData.email || "",
+        telefono: userData.telefono || "",
         password: "",
         confirmPassword: "",
-        rol: userData.rol || ""
+        rol: userData.rol || "",
+        is_active: userData.is_active !== undefined ? userData.is_active : true
       });
     }
   }, [id, isEdit, getUserById, userDataFromState]);
@@ -87,28 +105,40 @@ export default function UserRegisterForm() {
   }, [loadUserData]);
 
   const roleOptions = useMemo(() => {
-    const rolesCount = roles?.length || 0;
-    console.log(`[OPTIONS] RoleOptions recalculado - ${rolesCount} roles`, {
-      rolesLength: rolesCount,
-      isInitialLoad: rolesCount === 0,
-      note: rolesCount === 0 
-        ? "Roles aún no cargados (normal al montar el componente)"
-        : "Roles cargados correctamente. En desarrollo verás 2 logs por StrictMode"
-    });
     return (roles || []).map((r) => ({ label: r?.nombre ?? r, value: r?.nombre ?? r }));
   }, [roles]);
 
   const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
-    const payload = {
-      nombre: values.nombre,
-      correo: values.correo,
-      ...(values.password && { password: values.password }),
-    };
+    let payload;
     
-    // Incluir rol solo si es admin y hay un valor
-    // (El backend no debería permitir que no-admins cambien roles)
-    if (isAdmin && values.rol) {
-      payload.rol = values.rol;
+    if (isEdit) {
+      
+      payload = {
+        nombre: values.nombre.trim(),
+        correo: values.correo.trim(),
+        ...(values.password && { password: values.password }),
+        ...(isAdmin && values.rol && { rol: values.rol }),
+        is_active: values.is_active !== undefined ? values.is_active : true
+      };
+    } else {
+      
+      payload = {
+        nombre: values.nombre.trim(),
+        apellido: values.apellido.trim(),
+        documento: values.documento,
+        correo: values.correo.trim(),
+        ...(values.telefono && { telefono: values.telefono }),
+        password: values.password,
+        is_active: values.is_active !== undefined ? values.is_active : true
+      };
+      
+      if (isAdmin && values.rol) {
+        payload.rol = values.rol;
+      } 
+      
+      else if (!isAdmin) {
+        payload.rol = "cliente";
+      }
     }
 
     let result;
@@ -143,10 +173,10 @@ export default function UserRegisterForm() {
       </div>
       <div className="auth-hero-right">
         <Card className="auth-card no-hover" pt={{
-          root: { style: { padding: "1rem", maxHeight: "calc(100vh - 4rem)" } },
-          body: { style: { overflow: "hidden" } }
+          root: { style: { padding: "1rem", maxHeight: "calc(100vh - 2rem)", overflowY: "auto" } },
+          body: { style: { padding: "0.5rem" } }
         }}>
-          <h2>{isEdit ? "Editar Usuario" : "Registro"}</h2>
+          <h2 style={{ marginTop: 0, marginBottom: "0.5rem", fontSize: "1.5rem" }}>{isEdit ? "Editar Usuario" : "Registro"}</h2>
           <Formik
             initialValues={initialValues}
             enableReinitialize
@@ -156,42 +186,127 @@ export default function UserRegisterForm() {
             validateOnBlur={true}
           >
             {({ isSubmitting, errors, touched, setFieldValue, values }) => (
-              <Form className="p-fluid" pt={{ root: { style: { display: "flex", flexDirection: "column", gap: "0.4rem" } } }}>
-                <div className="p-field">
-                  <label htmlFor="nombre">Nombre</label>
-                  <Field name="nombre">
-                    {({ field }) => (
-                      <InputText 
-                        id="nombre" 
-                        {...field} 
-                        placeholder="Tu nombre" 
-                        className={touched.nombre && errors.nombre ? "p-invalid" : ""}
-                        pt={{ root: { style: { padding: "0.6rem" } } }}
-                      />
-                    )}
-                  </Field>
-                  <small className="p-error"><ErrorMessage name="nombre" /></small>
-                </div>
+              <Form className="p-fluid" style={{ display: "flex", flexDirection: "column", gap: "0.3rem" }}>
+                {!isEdit && (
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.3rem" }}>
+                    <div className="p-field">
+                      <label htmlFor="nombre" style={{ fontSize: "0.9rem", marginBottom: "0.2rem" }}>Nombre *</label>
+                      <Field name="nombre">
+                        {({ field }) => (
+                          <InputText 
+                            id="nombre" 
+                            {...field} 
+                            placeholder="Juan" 
+                            className={touched.nombre && errors.nombre ? "p-invalid" : ""}
+                            pt={{ root: { style: { padding: "0.5rem", fontSize: "0.9rem" } } }}
+                          />
+                        )}
+                      </Field>
+                      <small className="p-error" style={{ fontSize: "0.75rem" }}><ErrorMessage name="nombre" /></small>
+                    </div>
+
+                    <div className="p-field">
+                      <label htmlFor="apellido" style={{ fontSize: "0.9rem", marginBottom: "0.2rem" }}>Apellido *</label>
+                      <Field name="apellido">
+                        {({ field }) => (
+                          <InputText 
+                            id="apellido" 
+                            {...field} 
+                            placeholder="Pérez" 
+                            className={touched.apellido && errors.apellido ? "p-invalid" : ""}
+                            pt={{ root: { style: { padding: "0.5rem", fontSize: "0.9rem" } } }}
+                          />
+                        )}
+                      </Field>
+                      <small className="p-error" style={{ fontSize: "0.75rem" }}><ErrorMessage name="apellido" /></small>
+                    </div>
+                  </div>
+                )}
+
+                {isEdit && (
+                  <div className="p-field">
+                    <label htmlFor="nombre" style={{ fontSize: "0.9rem", marginBottom: "0.2rem" }}>Nombre *</label>
+                    <Field name="nombre">
+                      {({ field }) => (
+                        <InputText 
+                          id="nombre" 
+                          {...field} 
+                          placeholder="Juan" 
+                          className={touched.nombre && errors.nombre ? "p-invalid" : ""}
+                          pt={{ root: { style: { padding: "0.5rem", fontSize: "0.9rem" } } }}
+                        />
+                      )}
+                    </Field>
+                    <small className="p-error" style={{ fontSize: "0.75rem" }}><ErrorMessage name="nombre" /></small>
+                  </div>
+                )}
+
+                {!isEdit && (
+                  <div className="p-field">
+                    <label htmlFor="documento" style={{ fontSize: "0.9rem", marginBottom: "0.2rem" }}>Documento (DNI) *</label>
+                    <Field name="documento">
+                      {({ field }) => (
+                        <InputText 
+                          id="documento" 
+                          {...field} 
+                          placeholder="30123456"
+                          inputMode="numeric"
+                          onInput={(e) => {
+                            const value = e.target.value.replace(/\D+/g, "");
+                            setFieldValue("documento", value);
+                          }}
+                          className={touched.documento && errors.documento ? "p-invalid" : ""}
+                          pt={{ root: { style: { padding: "0.5rem", fontSize: "0.9rem" } } }}
+                        />
+                      )}
+                    </Field>
+                    <small className="p-error" style={{ fontSize: "0.75rem" }}><ErrorMessage name="documento" /></small>
+                  </div>
+                )}
 
                 <div className="p-field">
-                  <label htmlFor="correo">Correo</label>
+                  <label htmlFor="correo" style={{ fontSize: "0.9rem", marginBottom: "0.2rem" }}>Correo *</label>
                   <Field name="correo">
                     {({ field }) => (
                       <InputText 
                         id="correo" 
                         {...field} 
+                        type="email"
                         placeholder="correo@dominio.com" 
                         className={touched.correo && errors.correo ? "p-invalid" : ""}
-                        pt={{ root: { style: { padding: "0.6rem" } } }}
+                        pt={{ root: { style: { padding: "0.5rem", fontSize: "0.9rem" } } }}
                       />
                     )}
                   </Field>
-                  <small className="p-error"><ErrorMessage name="correo" /></small>
+                  <small className="p-error" style={{ fontSize: "0.75rem" }}><ErrorMessage name="correo" /></small>
                 </div>
 
-                {isAdmin && (
+                {!isEdit && (
                   <div className="p-field">
-                    <label htmlFor="rol">Rol</label>
+                    <label htmlFor="telefono" style={{ fontSize: "0.9rem", marginBottom: "0.2rem" }}>Teléfono</label>
+                    <Field name="telefono">
+                      {({ field }) => (
+                        <InputText 
+                          id="telefono" 
+                          {...field} 
+                          placeholder=""
+                          inputMode="numeric"
+                          onInput={(e) => {
+                            const value = e.target.value.replace(/\D+/g, "");
+                            setFieldValue("telefono", value);
+                          }}
+                          className={touched.telefono && errors.telefono ? "p-invalid" : ""}
+                          pt={{ root: { style: { padding: "0.5rem", fontSize: "0.9rem" } } }}
+                        />
+                      )}
+                    </Field>
+                    <small className="p-error" style={{ fontSize: "0.75rem" }}><ErrorMessage name="telefono" /></small>
+                  </div>
+                )}
+
+                {!isEdit && isAdmin && (
+                  <div className="p-field">
+                    <label htmlFor="rol" style={{ fontSize: "0.9rem", marginBottom: "0.2rem" }}>Rol</label>
                     <Dropdown
                       id="rol"
                       value={values.rol}
@@ -199,16 +314,68 @@ export default function UserRegisterForm() {
                       options={roleOptions}
                       placeholder="-- Elegir rol --"
                       className={touched.rol && errors.rol ? "p-invalid" : ""}
-                      pt={{ root: { style: { padding: "0.6rem" } } }}
+                      pt={{ root: { style: { padding: "0.5rem", fontSize: "0.9rem" } } }}
                     />
-                    <small className="p-error"><ErrorMessage name="rol" /></small>
+                    <small className="p-error" style={{ fontSize: "0.75rem" }}><ErrorMessage name="rol" /></small>
+                  </div>
+                )}
+
+                {isEdit && (
+                  <div className="p-field">
+                    <label htmlFor="password" style={{ fontSize: "0.9rem", marginBottom: "0.2rem" }}>Nueva Contraseña (opcional)</label>
+                    <Field name="password">
+                      {({ field }) => (
+                        <Password 
+                          id="password" 
+                          {...field} 
+                          feedback={false} 
+                          toggleMask 
+                          placeholder="Dejar vacío para mantener la actual" 
+                          inputClassName={touched.password && errors.password ? "p-invalid" : ""}
+                          pt={{ input: { style: { padding: "0.5rem", fontSize: "0.8rem" } } }}
+                        />
+                      )}
+                    </Field>
+                    <small className="p-error" style={{ fontSize: "0.75rem" }}><ErrorMessage name="password" /></small>
+                  </div>
+                )}
+
+                {isEdit && isAdmin && (
+                  <div className="p-field">
+                    <label htmlFor="rol" style={{ fontSize: "0.9rem", marginBottom: "0.2rem" }}>Rol</label>
+                    <Dropdown
+                      id="rol"
+                      value={values.rol}
+                      onChange={(e) => setFieldValue("rol", e.value)}
+                      options={roleOptions}
+                      placeholder="-- Elegir rol --"
+                      className={touched.rol && errors.rol ? "p-invalid" : ""}
+                      pt={{ root: { style: { padding: "0.5rem", fontSize: "0.9rem" } } }}
+                    />
+                    <small className="p-error" style={{ fontSize: "0.75rem" }}><ErrorMessage name="rol" /></small>
+                  </div>
+                )}
+
+                {isEdit && (
+                  <div className="p-field">
+                    <label htmlFor="is_active" style={{ fontSize: "0.9rem", marginBottom: "0.2rem" }}>Usuario activo</label>
+                    <Field name="is_active">
+                      {({ field }) => (
+                        <InputSwitch 
+                          id="is_active" 
+                          checked={field.value}
+                          onChange={(e) => setFieldValue("is_active", e.value)}
+                          pt={{ root: { style: { marginTop: "0.25rem" } } }}
+                        />
+                      )}
+                    </Field>
                   </div>
                 )}
 
                 {!isEdit && (
-                  <>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.3rem" }}>
                     <div className="p-field">
-                      <label htmlFor="password">Contraseña</label>
+                      <label htmlFor="password" style={{ fontSize: "0.9rem", marginBottom: "0.2rem" }}>Contraseña</label>
                       <Field name="password">
                         {({ field }) => (
                           <Password 
@@ -218,15 +385,15 @@ export default function UserRegisterForm() {
                             toggleMask 
                             placeholder="••••••" 
                             inputClassName={touched.password && errors.password ? "p-invalid" : ""}
-                            pt={{ input: { style: { padding: "0.6rem" } } }}
+                            pt={{ input: { style: { padding: "0.5rem", fontSize: "0.9rem" } } }}
                           />
                         )}
                       </Field>
-                      <small className="p-error"><ErrorMessage name="password" /></small>
+                      <small className="p-error" style={{ fontSize: "0.75rem" }}><ErrorMessage name="password" /></small>
                     </div>
 
                     <div className="p-field">
-                      <label htmlFor="confirmPassword">Confirmar contraseña</label>
+                      <label htmlFor="confirmPassword" style={{ fontSize: "0.9rem", marginBottom: "0.2rem" }}>Confirmar</label>
                       <Field name="confirmPassword">
                         {({ field }) => (
                           <Password 
@@ -236,13 +403,13 @@ export default function UserRegisterForm() {
                             toggleMask 
                             placeholder="••••••" 
                             inputClassName={touched.confirmPassword && errors.confirmPassword ? "p-invalid" : ""}
-                            pt={{ input: { style: { padding: "0.6rem" } } }}
+                            pt={{ input: { style: { padding: "0.5rem", fontSize: "0.9rem" } } }}
                           />
                         )}
                       </Field>
-                      <small className="p-error"><ErrorMessage name="confirmPassword" /></small>
+                      <small className="p-error" style={{ fontSize: "0.75rem" }}><ErrorMessage name="confirmPassword" /></small>
                     </div>
-                  </>
+                  </div>
                 )}
 
                 <Button 
@@ -251,17 +418,17 @@ export default function UserRegisterForm() {
                   className="p-button-primary" 
                   loading={isSubmitting} 
                   icon={isEdit ? "pi pi-check" : "pi pi-user-plus"}
-                  pt={{ root: { style: { marginTop: "0.5rem", padding: "0.6rem" } } }}
+                  pt={{ root: { style: { marginTop: "0.3rem", padding: "0.5rem", fontSize: "0.9rem" } } }}
                 />
 
-                <div className="p-field">
+                <div style={{ marginTop: "0.5rem", display: "flex", justifyContent: "center" }}>
                   <Button 
                     type="button" 
-                    label="Atrás" 
+                    label="Volver" 
                     icon="pi pi-arrow-left" 
                     className="p-button-text p-button-sm" 
                     onClick={() => navigate(-1)}
-                    pt={{ root: { style: { padding: "0.4rem 0.8rem", margin: "0 auto", display: "block" } } }}
+                    style={{ fontSize: "0.9rem" }}
                   />
                 </div>
               </Form>
