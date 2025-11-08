@@ -18,7 +18,9 @@ function App() {
                 <Route path="/*" element={<HomeRoutes />} />
                 <Route 
                     path="/auth/*" 
-                    element={<AuthRoutes />} 
+                    element={
+                        <AuthRoutes />
+                    } 
                 />
                 <Route
                     path="/user/*"
@@ -28,7 +30,8 @@ function App() {
                         </UserProvider>
                     }
                 />
-                {/* Todas las rutas de clientes (públicas y privadas) */}
+
+                {/* Rutas privadas */}
                 <Route
                     path="/client/*"
                     element={
