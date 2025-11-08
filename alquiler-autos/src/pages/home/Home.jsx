@@ -83,20 +83,27 @@ export default function Home() {
                     <h3 style={{ marginTop: 0 }}>Hola: {user.nombre}</h3>
                     <p> {user.correo}</p>
                     
-                    <div style={{ display: "flex", gap: 12, justifyContent: "center", width: "100%", marginBottom: "1rem", flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", gap: 12, justifyContent: "center", alignItems: "center", width: "100%", marginBottom: "1rem", flexWrap: "wrap" }}>
                         {user?.rol === "admin" && (
-                            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
                                 <Button label="Lista de Usuarios" icon="pi pi-users" className="p-button-secondary" onClick={() => navigate('/user/list')} />
                                 <Button label="Registrar Usuario" icon="pi pi-user-plus" className="p-button-secondary" onClick={() => navigate('/user/register')} />
                             </div>
                         )}
-                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
                             <Button label="Lista de Clientes" icon="pi pi-users" className="p-button-secondary" onClick={() => navigate('/client/list')} />
                             {user?.rol === "admin" && (
                                 <Button label="Registrar Cliente" icon="pi pi-user-plus" className="p-button-secondary" onClick={() => navigate('/client/register')} />
                             )}
                         </div>
                     </div>
+                    
+                    {(user?.rol === "admin" || user?.rol === "empleado") && (
+                        <div style={{ display: "flex", gap: 12, justifyContent: "center", width: "100%", marginBottom: "1rem", flexWrap: "wrap" }}>
+                            <Button label="Flota" icon="pi pi-car" className="p-button-secondary" onClick={() => navigate('/car/list')} style={{ minWidth: "140px" }} />
+                            <Button label="Reservas" icon="pi pi-calendar" className="p-button-secondary" onClick={() => navigate('/rental/list')} style={{ minWidth: "140px" }} />
+                        </div>
+                    )}
                     
                     <div style={{ display: "flex", justifyContent: "center", width: "100%" }}>
                         <Button label="Cerrar sesión" icon="pi pi-sign-out" className="p-button-danger" onClick={() => signOut()} />
