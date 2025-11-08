@@ -1,4 +1,4 @@
-import { Routes,Router, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { Fragment } from "react";
 
 import PrivateRoute from "./utils/PrivateRoute";
@@ -28,19 +28,13 @@ function App() {
                         </UserProvider>
                     }
                 />
-                {/* Rutas privadas */}
-                
-
-                    <Route
+                {/* Todas las rutas de clientes (públicas y privadas) */}
+                <Route
                     path="/client/*"
                     element={
-                        <PrivateRoute>            
-                        <UserProvider>
-                            <ClientProvider>
+                        <ClientProvider>
                             <ClientRoutes />
-                            </ClientProvider>
-                        </UserProvider>
-                        </PrivateRoute>
+                        </ClientProvider>
                     }
                 />
             </Routes>

@@ -1,3 +1,3 @@
 import { resource } from "./api";
 
-export const clientService = resource("clients", "Cliente");
+export const clientService = resource("client", "Cliente");

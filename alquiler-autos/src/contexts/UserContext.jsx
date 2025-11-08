@@ -5,7 +5,7 @@ export const UserContext = createContext()
 export const UserProvider = ({children}) =>{
   
     const [roles, setRoles] = useState([]);
-    const [users, setUsers] = useState([])
+    const [users, setUsers] = useState([]);
 
     const fetchRoles = async () => {
         try {
@@ -13,8 +13,43 @@ export const UserProvider = ({children}) =>{
             const data = res?.data?.data 
             setRoles(Array.isArray(data) ? data : []);
         } catch (err) {
-            console.error("Error al obtener roles:", err);
             setRoles([]); 
+        }
+    };
+
+    const fetchUsers = async () => {
+        try {
+            const res = await userService.list();
+            const data = res?.data?.data;
+            // Filtrar solo usuarios activos (is_active === true)
+            const filteredData = Array.isArray(data) 
+                ? data.filter(user => user.is_active === true)
+                : [];
+            setUsers(filteredData);
+            const ok = res.status === 200 || res.status === 201;
+            const msg = res?.message || (ok ? "Usuarios obtenidos correctamente." : "Error al obtener usuarios.");
+            return { ok, message: msg };
+        } catch (err) {
+            setUsers([]);
+            const msg = err?.response?.data?.message || err?.message || "Error al obtener usuarios.";
+            return { ok: false, message: msg };
+        }
+    };
+
+    const deleteUser = async (id) => {
+        try {
+            const res = await userService.delete(id);
+            const ok = res.status === 200 || res.status === 201 || res.status === 204;
+            const msg = res?.message || (ok ? "Usuario eliminado correctamente." : "Error al eliminar el usuario.");
+            
+            if (ok) {
+                await fetchUsers();
+            }
+            
+            return { ok, message: msg };
+        } catch (err) {
+            const msg = err?.response?.data?.message || err?.message || "Error al eliminar el usuario.";
+            return { ok: false, message: msg };
         }
     };
 
@@ -22,9 +57,9 @@ export const UserProvider = ({children}) =>{
         fetchRoles();
     }, []); 
 
-    const registerUser = async ({ nombre, correo, password, rol }) => {
+    const registerUser = async ({ nombre, correo, password, rol, is_active }) => {
         try {
-            const payload = { nombre, correo, password, rol };
+            const payload = { nombre, correo, password, rol, is_active };
             const res = await userService.register(payload);
 
             const ok = res.status === 200 || res.status === 201;
@@ -32,72 +67,49 @@ export const UserProvider = ({children}) =>{
 
             return { ok, message: msg, data: res?.data };
         } catch (err) {
-            console.error("Error al registrar usuario:", err);
             const msg = err?.response?.data?.message || err?.message || "Error al registrar el usuario.";
 
             return { ok: false, message: msg };
         }
     };
 
-    const fetchUser = async () => {
+    const editUser = async (id, { nombre, correo, password, rol, is_active }) => {
         try {
-            const res = await userService.list();
-            const ok = res.status === 200 || res.status === 201;
-            const msg = res?.message || (ok ? "Lista de usuarios exitosa" : "Error al consultar usuarios.");
-            console.log(res.data)
-            if (ok && res?.data?.data) {
-                setUsers(res.data.data.filter(user => user.is_active));
+            const payload = { nombre, correo };
+            if (password) payload.password = password;
+            if (rol !== undefined) payload.rol = rol;
+            if (is_active !== undefined) payload.is_active = is_active;
+            const res = await userService.update(id, payload);
 
-            }
-            return { ok, message: msg};
+            const ok = res.status === 200 || res.status === 201;
+            const msg = res?.data?.message || (ok ? "Usuario actualizado." : "Error al actualizar el usuario.");
+
+            return { ok, message: msg, data: res?.data };
         } catch (err) {
-            console.error("Error al consultar usuarios:", err);
-            const msg = err?.response?.data?.message || err?.message || "Error al consultar usuarios.";
+            const msg = err?.response?.data?.message || err?.message || "Error al actualizar el usuario.";
 
             return { ok: false, message: msg };
         }
-
     };
 
-    const editUser = async (id, updated) => {
+    const getUserById = async (id) => {
         try {
-            await userService.update(id, updated);
-            setUsers(prev =>
-                prev.map(u => (u.id === id ? { ...u, ...updated } : u))
-            );
+            const res = await userService.get(id);
+            return res?.data?.data || null;
         } catch (err) {
-            console.error("Error al editar usuario:", err);
-            alert(err?.response?.data?.message || err.message || "Error al editar usuario.");
+            return null;
         }
     };
-
-
-    const deleteUser = async (id) => {
-        try {
-            const res = await userService.delete(id);
-            const ok = res.status === 200 || res.status === 204;
-            const message = res.message || (ok ? "Usuario eliminado exitosamente." : "Error al eliminar usuario.");
-            
-            return { ok, message };
-        } catch (err) {
-            console.error("Error al eliminar usuario:", err?.response || err);
-            const message = err?.response?.data?.message || err?.message || "Error al eliminar usuario.";
-            
-            return { ok: false, message };
-        } finally {
-            fetchUser();
-        }
-    };
-
 
     const value = useMemo(() => ({
-        users,
         roles,
+        users,
+        registerUser,
         editUser,
+        fetchUsers,
         deleteUser,
-        fetchUser,
-        registerUser
-    }),[roles,users]);
+        getUserById
+    }),[roles, users]);
 
     return (
         <UserContext.Provider value={value}>

@@ -9,16 +9,28 @@ export const api = axios.create({
 
 
 api.interceptors.request.use((config) => {
-    startLoading();
+    // Solo activar loading global si no se especifica skipGlobalLoading
+    if (!config.skipGlobalLoading) {
+        startLoading();
+    }
     const token = localStorage.getItem("token");
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
 });
 
 api.interceptors.response.use(
-  (res) => { stopLoading(); return res; },
+  (res) => { 
+    // Solo detener loading global si no se especificó skipGlobalLoading
+    if (!res.config?.skipGlobalLoading) {
+        stopLoading(); 
+    }
+    return res; 
+  },
   (error) => {
-    stopLoading();
+    // Solo detener loading global si no se especificó skipGlobalLoading
+    if (!error.config?.skipGlobalLoading) {
+        stopLoading();
+    }
 
     const status = error?.response?.status;
     const normalized = {

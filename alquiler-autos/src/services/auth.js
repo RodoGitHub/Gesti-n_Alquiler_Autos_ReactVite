@@ -25,7 +25,7 @@ export const authService = {
 
   // POST /auth/login/
   login: (credentials, config) =>
-    RESOURCE.post("login", credentials, config),
+    RESOURCE.post("login", credentials, { ...config, skipGlobalLoading: true }),
 
   // POST /auth/refresh/
   refresh: (refreshToken, config) =>
