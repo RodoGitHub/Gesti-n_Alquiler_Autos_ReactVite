@@ -8,6 +8,7 @@ import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { useToast } from "../../contexts/ToastContext";
+import "../../../styles/pages/auth/LoginForm.css";
 
 export default function LoginForm() {
   const { signIn } = useContext(AuthContext);
@@ -73,8 +74,8 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="auth-hero">
-      <div style={leftSideStyle}>
+    <div className="login-auth-hero">
+      <div style={leftSideStyle} className="login-auth-hero-left">
         <div style={overlayStyle}></div>
         <div style={leftContentStyle}>
           <div>
@@ -93,8 +94,8 @@ export default function LoginForm() {
           </div>
         </div>
       </div>
-      <div className="auth-hero-right">
-        <Card className="auth-card no-hover">
+      <div className="login-auth-hero-right">
+        <Card className="login-auth-card login-no-hover">
           <h2 style={{ marginTop: 0 }}>Iniciar sesión</h2>
           <Formik
             initialValues={{ correo: "", password: "" }}
@@ -111,7 +112,7 @@ export default function LoginForm() {
                         id="correo"
                         {...field}
                         placeholder="correo@dominio.com"
-                        className={touched.correo && errors.correo ? "p-invalid" : ""}
+                        className={`login-input-text ${touched.correo && errors.correo ? "p-invalid" : ""}`}
                       />
                     )}
                   </Field>
@@ -130,7 +131,7 @@ export default function LoginForm() {
                         feedback={false}
                         toggleMask
                         placeholder="••••••"
-                        inputClassName={touched.password && errors.password ? "p-invalid" : ""}
+                        inputClassName={`login-password ${touched.password && errors.password ? "p-invalid" : ""}`}
                       />
                     )}
                   </Field>

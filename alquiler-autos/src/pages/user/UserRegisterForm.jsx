@@ -11,6 +11,7 @@ import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { InputSwitch } from "primereact/inputswitch";
 import { useToast } from "../../contexts/ToastContext";
+import "../../../styles/pages/user/UserRegisterForm.css";
 
 export default function UserRegisterForm() {
   const navigate = useNavigate();
@@ -198,8 +199,8 @@ export default function UserRegisterForm() {
   };
 
   return (
-    <div className="auth-hero">
-      <div style={leftSideStyle}>
+    <div className="user-register-auth-hero">
+      <div style={leftSideStyle} className="user-register-auth-hero-left">
         <div style={overlayStyle}></div>
         <div style={leftContentStyle}>
           <h1>Gestion de autos</h1>
@@ -207,8 +208,8 @@ export default function UserRegisterForm() {
           <p>{isEdit ? "Modifica los datos del usuario" : "Completa el formulario para registrarte"}</p>
         </div>
       </div>
-      <div className="auth-hero-right">
-        <Card className="auth-card no-hover" pt={{
+      <div className="user-register-auth-hero-right">
+        <Card className="user-register-auth-card user-register-no-hover" pt={{
           root: { style: { padding: "1rem", maxHeight: "calc(100vh - 2rem)", overflowY: "auto" } },
           body: { style: { padding: "0.5rem" } }
         }}>

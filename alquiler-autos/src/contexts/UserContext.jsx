@@ -57,9 +57,9 @@ export const UserProvider = ({children}) =>{
         fetchRoles();
     }, []); 
 
-    const registerUser = async ({ nombre, apellido, documento, correo, telefono, password, rol, is_active }) => {
+    const registerUser = async ({ nombre, correo, password, rol, is_active }) => {
         try {
-            const payload = { nombre, apellido, documento, correo, telefono, password, rol, is_active };
+            const payload = { nombre, correo, password, rol, is_active };
             const res = await userService.register(payload);
 
             const ok = res.status === 200 || res.status === 201;

@@ -10,7 +10,6 @@ import AuthRoutes from "./pages/auth";
 import UserRoutes from "./pages/user";
 import HomeRoutes from "./pages/home"; 
 import ClientRoutes from "./pages/client";
-import ClientRegisterForm from "./pages/client/ClientRegisterForm";
 
 function App() {
     return (
@@ -29,26 +28,13 @@ function App() {
                         </UserProvider>
                     }
                 />
-                {/* Ruta pública para registro de clientes (sin autenticación) */}
-                <Route
-                    path="/client/register-public"
-                    element={
-                        <ClientProvider>
-                            <ClientRegisterForm />
-                        </ClientProvider>
-                    }
-                />
-                {/* Rutas privadas de clientes */}
+                {/* Todas las rutas de clientes (públicas y privadas) */}
                 <Route
                     path="/client/*"
                     element={
-                        <PrivateRoute>            
-                        <UserProvider>
-                            <ClientProvider>
+                        <ClientProvider>
                             <ClientRoutes />
-                            </ClientProvider>
-                        </UserProvider>
-                        </PrivateRoute>
+                        </ClientProvider>
                     }
                 />
             </Routes>

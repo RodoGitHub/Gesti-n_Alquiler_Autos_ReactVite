@@ -8,6 +8,7 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import "../../../styles/pages/client/ClientList.css";
 
 export default function ClientList() {
     const { user } = useContext(AuthContext);
@@ -109,26 +110,13 @@ export default function ClientList() {
     };
 
     return (
-        <div style={{ 
-            minHeight: "100vh", 
-            padding: "2rem", 
-            backgroundColor: "#0D3B66",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center"
-        }} className="client-list-container">
-            <Card 
-                style={{ 
-                    width: "100%", 
-                    maxWidth: "1200px",
-                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
-                }}
-            >
-                <div style={{ marginBottom: "1.5rem" }}>
-                    <h1 style={{ margin: 0, color: "#1F2937", fontSize: "1.875rem", fontWeight: "600" }}>
+        <div className="client-list-container">
+            <Card className="client-list-card">
+                <div className="client-list-header">
+                    <h1 className="client-list-title">
                         Lista de Clientes
                     </h1>
-                    <p style={{ margin: "0.5rem 0 0 0", color: "#6B7280" }}>
+                    <p className="client-list-subtitle">
                         Gestiona todos los clientes del sistema
                     </p>
                 </div>

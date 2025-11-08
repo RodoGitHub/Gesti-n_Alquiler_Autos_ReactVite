@@ -1,5 +1,6 @@
 import { useEffect, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../contexts/AuthContext";
 import { UserContext } from "../../contexts/UserContext";
 import { useToast } from "../../contexts/ToastContext";
 import { Card } from "primereact/card";
@@ -8,8 +9,10 @@ import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { Tag } from "primereact/tag";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import "../../../styles/pages/user/UserList.css";
 
 export default function UserList() {
+    const { user } = useContext(AuthContext);
     const { fetchUsers, deleteUser, users } = useContext(UserContext);
     const { showToast } = useToast();
     const navigate = useNavigate();
@@ -34,10 +37,26 @@ export default function UserList() {
     }, []);
 
     const handleEdit = (userData) => {
+        if (user?.rol !== "admin") {
+            showToast({
+                severity: "warn",
+                summary: "Acceso denegado",
+                detail: "Solo los administradores pueden editar usuarios."
+            });
+            return;
+        }
         navigate(`/user/edit/${userData.id}`, { state: { userData } });
     };
 
     const handleDelete = async (id) => {
+        if (user?.rol !== "admin") {
+            showToast({
+                severity: "warn",
+                summary: "Acceso denegado",
+                detail: "Solo los administradores pueden eliminar usuarios."
+            });
+            return;
+        }
         confirmDialog({
             message: "¿Estás seguro de que querés eliminar este usuario?",
             header: "Confirmar eliminación",
@@ -57,6 +76,11 @@ export default function UserList() {
     };
 
     const actionBodyTemplate = (rowData) => {
+        // Solo admin puede ver las acciones de editar y eliminar
+        if (user?.rol !== "admin") {
+            return null;
+        }
+        
         return (
             <div style={{ display: "flex", gap: "0.5rem" }}>
                 <Button
@@ -98,37 +122,28 @@ export default function UserList() {
     };
 
     return (
-        <div style={{ 
-            minHeight: "100vh", 
-            padding: "2rem", 
-            backgroundColor: "#0D3B66",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center"
-        }} className="user-list-container">
-            <Card 
-                style={{ 
-                    width: "100%", 
-                    maxWidth: "1200px",
-                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
-                }}
-            >
-                <div style={{ marginBottom: "1.5rem", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div className="user-list-container">
+            <Card className="user-list-card">
+                <div className="user-list-header">
                     <div>
-                        <h1 style={{ margin: 0, color: "#1F2937", fontSize: "1.875rem", fontWeight: "600" }}>
+                        <h1 className="user-list-title">
                             Lista de Usuarios
                         </h1>
-                        <p style={{ margin: "0.5rem 0 0 0", color: "#6B7280" }}>
-                            Gestiona todos los usuarios del sistema
+                        <p className="user-list-subtitle">
+                            {user?.rol === "admin" 
+                                ? "Gestiona todos los usuarios del sistema" 
+                                : "Lista de usuarios del sistema"}
                         </p>
                     </div>
-                    <Button 
-                        label="Registrar Usuario" 
-                        icon="pi pi-user-plus" 
-                        className="p-button-primary"
-                        onClick={() => navigate("/user/register")}
-                        style={{ marginTop: "0.5rem" }}
-                    />
+                    {user?.rol === "admin" && (
+                        <Button 
+                            label="Registrar Usuario" 
+                            icon="pi pi-user-plus" 
+                            className="p-button-primary"
+                            onClick={() => navigate("/user/register")}
+                            style={{ marginTop: "0.5rem" }}
+                        />
+                    )}
                 </div>
 
                 <DataTable

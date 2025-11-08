@@ -8,6 +8,7 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { InputSwitch } from "primereact/inputswitch";
 import { useToast } from "../../contexts/ToastContext";
+import "../../../styles/pages/client/ClientRegisterForm.css";
 
 export default function ClientRegisterForm() {
   const navigate = useNavigate();
@@ -140,8 +141,8 @@ export default function ClientRegisterForm() {
   };
 
   return (
-    <div className="auth-hero">
-      <div style={leftSideStyle}>
+    <div className="client-register-auth-hero">
+      <div style={leftSideStyle} className="client-register-auth-hero-left">
         <div style={overlayStyle}></div>
         <div style={leftContentStyle}>
           <h1>Gestión de Autos</h1>
@@ -149,8 +150,8 @@ export default function ClientRegisterForm() {
           <p>{isEdit ? "Modifica los datos del cliente" : "Completa el formulario para registrar un cliente"}</p>
         </div>
       </div>
-      <div className="auth-hero-right">
-        <Card className="auth-card no-hover" pt={{
+      <div className="client-register-auth-hero-right">
+        <Card className="client-register-auth-card client-register-no-hover" pt={{
           root: { style: { padding: "1rem", maxHeight: "calc(100vh - 4rem)" } },
           body: { style: { overflow: "auto", display: "flex", flexDirection: "column" } }
         }}>

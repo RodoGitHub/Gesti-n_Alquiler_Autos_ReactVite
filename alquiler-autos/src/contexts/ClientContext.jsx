@@ -1,4 +1,4 @@
-import { createContext, useMemo, useState, useCallback } from "react";
+import { createContext, useMemo, useState } from "react";
 import { clientService } from "../services/clients";
 
 export const ClientContext = createContext();
@@ -6,7 +6,7 @@ export const ClientContext = createContext();
 export const ClientProvider = ({ children }) => {
     const [clients, setClients] = useState([]);
 
-    const registerClient = useCallback(async ({ nombre, apellido, documento, correo, telefono, is_active }) => {
+    const registerClient = async ({ nombre, apellido, documento, correo, telefono, is_active }) => {
         const payload = { nombre, apellido, documento, correo, telefono, is_active };
         
         const res = await clientService.create(payload);
@@ -24,9 +24,9 @@ export const ClientProvider = ({ children }) => {
             setClients(prev => [res.data.data, ...prev]);
         }
         return { ok: true, message: msg, data: res?.data?.data };
-    }, []);
+    };
 
-    const fetchClients = useCallback(async () => {
+    const fetchClients = async () => {
         try {
             const res = await clientService.list();
             const ok = res.status === 200;
@@ -40,9 +40,9 @@ export const ClientProvider = ({ children }) => {
             const msg = err?.response?.data?.message || err?.message || "Error al consultar clientes.";
             return { ok: false, message: msg };
         }
-    }, []);
+    };
 
-    const getClient = useCallback(async (id) => {
+    const getClient = async (id) => {
         try {
             const res = await clientService.get(id);
             const ok = res.status === 200;
@@ -52,9 +52,9 @@ export const ClientProvider = ({ children }) => {
             const msg = err?.response?.data?.message || err?.message || "Error al obtener el cliente.";
             return { ok: false, message: msg };
         }
-    }, []);
+    };
 
-    const editClient = useCallback(async (id, updated) => {
+    const editClient = async (id, updated) => {
         try {
             const res = await clientService.update(id, updated);
             const ok = res.status === 200;
@@ -67,9 +67,9 @@ export const ClientProvider = ({ children }) => {
             const msg = err?.response?.data?.message || err?.message || "Error al editar cliente.";
             return { ok: false, message: msg };
         }
-    }, []);
+    };
 
-    const deleteClient = useCallback(async (id) => {
+    const deleteClient = async (id) => {
         try {
             const res = await clientService.delete(id);
             const ok = res.status === 200;
@@ -80,7 +80,7 @@ export const ClientProvider = ({ children }) => {
             const message = err?.response?.data?.message || err?.message || "Error al eliminar el cliente.";
             return { ok: false, message };
         }
-    }, []);
+    };
 
     const value = useMemo(
         () => ({
@@ -91,7 +91,7 @@ export const ClientProvider = ({ children }) => {
             editClient,
             deleteClient,
         }),
-        [clients, fetchClients, getClient, registerClient, editClient, deleteClient]
+        [clients]
     );
 
     return (

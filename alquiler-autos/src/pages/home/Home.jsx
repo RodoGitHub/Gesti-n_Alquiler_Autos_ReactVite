@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { AUTH_TYPE } from "../../constants/authType";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
+import "../../../styles/pages/home/Home.css";
 // Para usar una imagen local, descomenta la siguiente línea y coloca tu imagen en src/assets/
 // import autoImagen from "../../assets/tu-imagen.jpg";
 // Fuentes de imágenes gratuitas: Unsplash.com, Pexels.com, Pixabay.com
@@ -53,7 +54,7 @@ export default function Home() {
             <div style={backgroundStyle} className="home-container">
                 <div style={overlayStyle}></div>
                 <div style={contentStyle}>
-                    <Card className="auth-card no-hover" style={{ maxWidth: 520, width: "100%", textAlign: "center", margin: "0 auto" }}>
+                    <Card className="home-auth-card home-no-hover" style={{ maxWidth: 520, width: "100%", textAlign: "center", margin: "0 auto" }}>
                         <h2 style={{ marginTop: 0 }}>Bienvenido</h2>
                         <p style={{ marginTop: 0 }}>No hay usuario logueado.</p>
                         <div style={{ display: "flex", gap: 12, justifyContent: "center", width: "100%", marginBottom: "1rem", flexWrap: "wrap" }}>
@@ -75,10 +76,10 @@ export default function Home() {
     }
 
     return(
-        <div style={backgroundStyle}>
+        <div style={backgroundStyle} className="home-container">
             <div style={overlayStyle}></div>
             <div style={contentStyle}>
-                <Card className="auth-card no-hover" style={{ maxWidth: 520, width: "100%", textAlign: "center", margin: "0 auto" }}>
+                <Card className="home-auth-card home-no-hover" style={{ maxWidth: 520, width: "100%", textAlign: "center", margin: "0 auto" }}>
                     <h2 style={{ marginTop: 0 }}>Inicio</h2>
                     <h3 style={{ marginTop: 0 }}>Hola: {user.nombre}</h3>
                     <p> {user.correo}</p>
