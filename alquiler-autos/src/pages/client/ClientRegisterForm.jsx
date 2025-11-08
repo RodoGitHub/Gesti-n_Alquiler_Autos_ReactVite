@@ -106,12 +106,48 @@ export default function ClientRegisterForm() {
     setSubmitting(false);
   };
 
+  const leftSideStyle = {
+    flex: 1,
+    minWidth: "300px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+    padding: "2rem",
+    color: "white",
+    backgroundColor: "#0D3B66",
+    backgroundImage: "url('https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    position: "relative"
+  };
+
+  const overlayStyle = {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(13, 59, 102, 0.7)",
+    zIndex: 1
+  };
+
+  const leftContentStyle = {
+    position: "relative",
+    zIndex: 2
+  };
+
   return (
     <div className="auth-hero">
-      <div className="auth-hero-left">
-        <h1>Gestión de Autos</h1>
-        <h2>{isEdit ? "Editar cliente" : "Registrar cliente"}</h2>
-        <p>{isEdit ? "Modifica los datos del cliente" : "Completa el formulario para registrar un cliente"}</p>
+      <div style={leftSideStyle}>
+        <div style={overlayStyle}></div>
+        <div style={leftContentStyle}>
+          <h1>Gestión de Autos</h1>
+          <h2>{isEdit ? "Editar cliente" : "Registrar cliente"}</h2>
+          <p>{isEdit ? "Modifica los datos del cliente" : "Completa el formulario para registrar un cliente"}</p>
+        </div>
       </div>
       <div className="auth-hero-right">
         <Card className="auth-card no-hover" pt={{

@@ -113,13 +113,22 @@ export default function UserList() {
                     boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
                 }}
             >
-                <div style={{ marginBottom: "1.5rem" }}>
-                    <h1 style={{ margin: 0, color: "#1F2937", fontSize: "1.875rem", fontWeight: "600" }}>
-                        Lista de Usuarios
-                    </h1>
-                    <p style={{ margin: "0.5rem 0 0 0", color: "#6B7280" }}>
-                        Gestiona todos los usuarios del sistema
-                    </p>
+                <div style={{ marginBottom: "1.5rem", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                    <div>
+                        <h1 style={{ margin: 0, color: "#1F2937", fontSize: "1.875rem", fontWeight: "600" }}>
+                            Lista de Usuarios
+                        </h1>
+                        <p style={{ margin: "0.5rem 0 0 0", color: "#6B7280" }}>
+                            Gestiona todos los usuarios del sistema
+                        </p>
+                    </div>
+                    <Button 
+                        label="Registrar Usuario" 
+                        icon="pi pi-user-plus" 
+                        className="p-button-primary"
+                        onClick={() => navigate("/user/register")}
+                        style={{ marginTop: "0.5rem" }}
+                    />
                 </div>
 
                 <DataTable

@@ -32,12 +32,66 @@ export default function LoginForm() {
     setSubmitting(false);
   };
 
+  const leftSideStyle = {
+    flex: 1,
+    minWidth: "300px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+    padding: "2rem",
+    color: "white",
+    backgroundColor: "#0D3B66",
+    backgroundImage: "url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    position: "relative"
+  };
+
+  const overlayStyle = {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(13, 59, 102, 0.7)",
+    zIndex: 1
+  };
+
+  const leftContentStyle = {
+    position: "relative",
+    zIndex: 2,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignItems: "center",
+    height: "100%",
+    width: "100%",
+    padding: "2rem 0"
+  };
+
   return (
     <div className="auth-hero">
-      <div className="auth-hero-left">
-        <h1>Gestión de autos</h1>
-        <h2>Bienvenido de nuevo</h2>
-        <p>Ingresá tus credenciales</p>
+      <div style={leftSideStyle}>
+        <div style={overlayStyle}></div>
+        <div style={leftContentStyle}>
+          <div>
+            <h1>Gestión de autos</h1>
+            <h2>Bienvenido de nuevo</h2>
+            <p>Ingresá tus credenciales</p>
+          </div>
+          <div style={{ marginTop: "auto" }}>
+            <Button
+              label="Volver"
+              icon="pi pi-arrow-left"
+              className="p-button-text p-button-sm"
+              onClick={() => navigate(-1)}
+              style={{ fontSize: "0.9rem", color: "white" }}
+            />
+          </div>
+        </div>
       </div>
       <div className="auth-hero-right">
         <Card className="auth-card no-hover">

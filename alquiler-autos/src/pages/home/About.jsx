@@ -121,6 +121,15 @@ export default function About() {
                         pt={{ root: { style: { padding: "0.6rem" } } }}
                     />
                 </div>
+                <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: "0.5rem" }}>
+                    <Button 
+                        label="Volver" 
+                        icon="pi pi-arrow-left" 
+                        className="p-button-text p-button-sm" 
+                        onClick={() => navigate(-1)}
+                        style={{ fontSize: "0.9rem" }}
+                    />
+                </div>
             </Card>
         </div>
     );
