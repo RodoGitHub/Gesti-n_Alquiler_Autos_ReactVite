@@ -9,4 +9,14 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+        proxy: {
+            "/api": {
+                target: "https://gesti-nalquilerautosnodejs-production.up.railway.app",
+                changeOrigin: true,
+                secure: true,
+                rewrite: (path) => path.replace(/^\/api/, "")
+            }
+        }
+    }
 });

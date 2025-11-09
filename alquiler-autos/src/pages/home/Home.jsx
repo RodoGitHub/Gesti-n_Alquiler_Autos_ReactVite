@@ -4,7 +4,6 @@ import { Carousel } from "primereact/carousel";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 
-// 🔧 Cambiá estas imágenes por las tuyas (pueden ser locales /assets/*.jpg)
 const slides = [
     {
         id: 1,
@@ -32,20 +31,19 @@ const slides = [
     }
 ];
 
-// 🪪 Cards de abajo — dejé placeholders para que agregues tu contenido
 const infoCards = [
     {
         id: "c1",
         title: "Cobertura y seguros",
         text: "Agregá aquí info sobre tu cobertura, asistencia y pólizas.",
-        img: "https://images.unsplash.com/photo-1582588678413-dbf45f4823e9?q=80&w=1200&auto=format&fit=crop",
+        img: "https://plus.unsplash.com/premium_photo-1661375337384-b6e1f64d7d3d?fm=jpg&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Y2FyJTIwcHJvdGVjdGlvbnxlbnwwfHwwfHx8MA%3D%3D&ixlib=rb-4.1.0&q=80&w=1200&auto=format&fit=crop",
         to: "/about"
     },
     {
         id: "c2",
         title: "Flota renovada",
         text: "Modelos recientes, mantenimiento al día y variedad de segmentos.",
-        img: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1f7?q=80&w=1200&auto=format&fit=crop",
+        img: "https://images.unsplash.com/photo-1630165356623-266076eaceb6?fm=jpg&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2FyJTIwZmxlZXR8ZW58MHx8MHx8fDA%3D&ixlib=rb-4.1.0&q=80&w=1200&auto=format&fit=crop",
         to: "/vehicles"
     },
     {
@@ -102,7 +100,7 @@ export default function Home() {
 
     return (
         <div className="p-3 md:p-4" style={{ maxWidth: 1500, margin: "0 auto" }}>
-            {/* Carrusel */}
+
             <div className="card surface-card border-round-2xl p-2" style={{ boxShadow: "0 4px 16px rgba(0,0,0,.08)" }}>
                 <Carousel
                     ref={carouselRef}
@@ -117,7 +115,6 @@ export default function Home() {
                 />
             </div>
 
-            {/* Cards inferiores */}
             <div className="grid mt-4">
                 {infoCards.map((c) => (
                     <div key={c.id} className="col-12 md:col-4">

@@ -22,7 +22,7 @@ export default function Login() {
 
     const validationSchema = Yup.object({
         correo: Yup.string().email("Correo inválido").required("Correo requerido"),
-        password: Yup.string().min(6, "Mínimo 6 caracteres").required("Contraseña requerida")
+        password: Yup.string().min(5, "Mínimo 5 caracteres").required("Contraseña requerida")
     });
 
     const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
@@ -79,8 +79,8 @@ export default function Login() {
     }
 
     return (
-        <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 16 }}>
-            <Card style={{ width: 380, maxWidth: "95vw" }}>
+        <div style={{ minHeight: "60vh", display: "grid", placeItems: "center", padding: 16 }}>
+            <Card style={{ width: 500, maxWidth: "100vw"}}>
                 <h2 style={{ marginTop: 0, marginRight: 0, marginBottom: 8, marginLeft: 0 }}>
                     Iniciar sesión
                 </h2>

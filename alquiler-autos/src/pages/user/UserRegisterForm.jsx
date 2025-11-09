@@ -7,6 +7,8 @@ import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
+import { InputSwitch } from "primereact/inputswitch";
+import { Tag } from "primereact/tag";
 import { useToast } from "../../contexts/ToastContext";
 import { AuthContext } from "../../contexts/AuthContext";
 import { UserContext } from "../../contexts/UserContext";
@@ -28,7 +30,8 @@ export default function UserRegisterForm() {
         correo: "",
         password: "",
         confirmPassword: "",
-        rol: ""
+        rol: "",
+        is_active: true
     });
 
     const createSchema = Yup.object({
@@ -38,13 +41,15 @@ export default function UserRegisterForm() {
         confirmPassword: Yup.string()
             .oneOf([Yup.ref("password")], "Las contraseñas no coinciden")
             .required("Confirmación requerida"),
-        ...(isAdmin ? { rol: Yup.string().required("Rol requerido") } : {})
+        ...(isAdmin ? { rol: Yup.string().required("Rol requerido") } : {}),
+        is_active: Yup.boolean()
     });
 
     const editSchema = Yup.object({
         nombre: Yup.string().required("Nombre requerido"),
         correo: Yup.string().email("Correo inválido").required("Correo requerido"),
-        ...(isAdmin ? { rol: Yup.string().required("Rol requerido") } : {})
+        ...(isAdmin ? { rol: Yup.string().required("Rol requerido") } : {}),
+        is_active: Yup.boolean()
     });
 
     const validationSchema = isEdit ? editSchema : createSchema;
@@ -60,7 +65,8 @@ export default function UserRegisterForm() {
                     correo: data.correo || data.email || "",
                     password: "",
                     confirmPassword: "",
-                    rol: data.rol || ""
+                    rol: data.rol || "",
+                    is_active: data?.is_active !== false
                 });
             }
         };
@@ -74,7 +80,8 @@ export default function UserRegisterForm() {
                     nombre: values.nombre.trim(),
                     correo: values.correo.trim(),
                     ...(values.password ? { password: values.password } : {}),
-                    ...(isAdmin && values.rol ? { rol: values.rol } : {})
+                    ...(isAdmin && values.rol ? { rol: values.rol } : {}),
+                    ...(isAdmin ? { is_active: !!values.is_active } : {})  
                 };
 
                 const { ok, message } = await editUser(Number(id), payload);
@@ -92,7 +99,8 @@ export default function UserRegisterForm() {
                 nombre: values.nombre.trim(),
                 correo: values.correo.trim(),
                 password: values.password,
-                ...(isAdmin ? (values.rol ? { rol: values.rol } : {}) : { rol: "empleado" })
+                ...(isAdmin ? (values.rol ? { rol: values.rol } : {}) : { rol: "empleado" }),
+                ...(isAdmin ? { is_active: !!values.is_active } : {})      
             };
 
             const { ok, message } = await registerUser(payload);
@@ -181,7 +189,7 @@ export default function UserRegisterForm() {
                                         id="rol"
                                         value={values.rol}
                                         onChange={(e) => setFieldValue("rol", e.value)}
-                                        options={roles || []}      // [{ nombre: "admin" }, { nombre: "empleado" }]
+                                        options={roles || []}     
                                         optionLabel="nombre"
                                         optionValue="nombre"
                                         placeholder="-- Elegir rol --"
@@ -190,6 +198,24 @@ export default function UserRegisterForm() {
                                     <small className="p-error"><ErrorMessage name="rol" /></small>
                                 </div>
                             )}
+
+                            <div className="p-field" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                                <label style={{ marginRight: 6 }}>Estado</label>
+                                {isAdmin ? (
+                                    <>
+                                        <InputSwitch
+                                            checked={values.is_active}
+                                            onChange={(e) => setFieldValue("is_active", e.value)}
+                                        />
+                                        <span>{values.is_active ? "Activo" : "Inactivo"}</span>
+                                    </>
+                                ) : (
+                                    <Tag
+                                        value={values.is_active ? "Activo" : "Inactivo"}
+                                        severity={values.is_active ? "success" : "danger"}
+                                    />
+                                )}
+                            </div>
 
                             {!isEdit && (
                                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>

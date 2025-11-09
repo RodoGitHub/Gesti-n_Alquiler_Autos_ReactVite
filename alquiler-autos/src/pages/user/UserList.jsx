@@ -146,21 +146,22 @@ export default function UserList() {
                             sortable
                             style={{ minWidth: 220 }}
                         />
+
                         {isAdmin && (
-                            <>
-                                <Column field="rol" header="Rol" sortable style={{ width: 140 }} />
-                                <Column
-                                    header="Estado"
-                                    body={(row) => (
-                                        <Tag
-                                            value={row?.is_active ? "Activo" : "Inactivo"}
-                                            severity={row?.is_active ? "success" : "danger"}
-                                        />
-                                    )}
-                                    style={{ width: 140, textAlign: "center" }}
-                                />
-                            </>
+                            <Column field="rol" header="Rol" sortable style={{ width: 140 }} />
                         )}
+
+                        <Column
+                            header="Estado"
+                            body={(row) => (
+                                <Tag
+                                    value={row?.is_active ? "Activo" : "Inactivo"}
+                                    severity={row?.is_active ? "success" : "danger"}
+                                />
+                            )}
+                            style={{ width: 140, textAlign: "center" }}
+                        />
+
                         <Column
                             header="Acciones"
                             body={(row) => (
@@ -186,6 +187,7 @@ export default function UserList() {
                             style={{ width: 160 }}
                         />
                     </DataTable>
+
                 </div>
             </Card>
 
