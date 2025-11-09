@@ -1,4 +1,3 @@
-// src/pages/user/UserRegisterForm.jsx
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -24,7 +23,6 @@ export default function UserRegisterForm() {
 
     const isAdmin = user?.rol === "admin";
 
-    // Solo campos que el backend acepta
     const [initialValues, setInitialValues] = useState({
         nombre: "",
         correo: "",
@@ -33,7 +31,6 @@ export default function UserRegisterForm() {
         rol: ""
     });
 
-    // Validación para crear (password requerida)
     const createSchema = Yup.object({
         nombre: Yup.string().required("Nombre requerido"),
         correo: Yup.string().email("Correo inválido").required("Correo requerido"),
@@ -44,7 +41,6 @@ export default function UserRegisterForm() {
         ...(isAdmin ? { rol: Yup.string().required("Rol requerido") } : {})
     });
 
-    // Validación para editar (password opcional)
     const editSchema = Yup.object({
         nombre: Yup.string().required("Nombre requerido"),
         correo: Yup.string().email("Correo inválido").required("Correo requerido"),
@@ -53,7 +49,6 @@ export default function UserRegisterForm() {
 
     const validationSchema = isEdit ? editSchema : createSchema;
 
-    // Cargar datos para edición (solo los campos que acepta el back)
     useEffect(() => {
         const run = async () => {
             if (!isEdit || !id) return;
@@ -131,8 +126,8 @@ export default function UserRegisterForm() {
     }
 
     return (
-        <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 16 }}>
-            <Card style={{ width: 560, maxWidth: "95vw" }}>
+        <div style={{ minHeight: "90vh", display: "grid", placeItems: "center", padding: 16 }}>
+            <Card style={{ width: 760, maxWidth: "95vw" }}>
                 <h2 style={{ marginTop: 0, marginBottom: 8 }}>
                     {isEdit ? "Editar usuario" : "Registro de usuario"}
                 </h2>

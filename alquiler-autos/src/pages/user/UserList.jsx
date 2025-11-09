@@ -25,10 +25,10 @@ export default function UserList() {
 
     useEffect(() => {
         fetchUsers();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, []);
 
-    // 👇 si no es admin, ocultar inactivos
+
     const sourceUsers = useMemo(() => {
         const list = users || [];
         return isAdmin ? list : list.filter(u => u?.is_active === true);
@@ -98,8 +98,8 @@ export default function UserList() {
     }
 
     return (
-        <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 16 }}>
-            <Card style={{ width: 1000, maxWidth: "95vw" }}>
+        <div style={{ minHeight: "90vh", display: "grid", placeItems: "center", padding: 16}}>
+            <Card style={{ width: 1500, maxWidth: "95vw"}}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
                         <h2 style={{ marginTop: 0, marginBottom: 6 }}>Usuarios</h2>
