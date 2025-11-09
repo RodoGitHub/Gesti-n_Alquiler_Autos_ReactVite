@@ -23,7 +23,7 @@ const UserRoutes = () => {
                 }
             />
             <Route
-                path="list"
+                path="/list"
                 element={
                     <RequireRole roles={["admin", "empleado"]}>
                         <UserList />

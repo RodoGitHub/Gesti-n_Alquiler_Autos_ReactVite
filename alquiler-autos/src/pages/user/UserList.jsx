@@ -1,204 +1,194 @@
-import { useEffect, useContext, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Card } from "primereact/card";
+import { InputText } from "primereact/inputtext";
+import { Button } from "primereact/button";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import { Tag } from "primereact/tag";
+import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
+
 import { AuthContext } from "../../contexts/AuthContext";
 import { UserContext } from "../../contexts/UserContext";
 import { useToast } from "../../contexts/ToastContext";
-import { Card } from "primereact/card";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Button } from "primereact/button";
-import { Tag } from "primereact/tag";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
-import "../../../styles/pages/user/UserList.css";
+import { AUTH_TYPE } from "../../constants/authType";
 
 export default function UserList() {
-    const { user } = useContext(AuthContext);
-    const { fetchUsers, deleteUser, users } = useContext(UserContext);
-    const { showToast } = useToast();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
-    
-    useEffect(() => {
-        const loadUsers = async () => {
-            setLoading(true);
-            const { ok, message } = await fetchUsers();
-            if (!ok) {
-                showToast({
-                    severity: "error",
-                    summary: "Error",
-                    detail: message
-                });
-            }
-            setLoading(false);
-        };
+    const { showToast } = useToast();
 
-        loadUsers();
+    const { user, status } = useContext(AuthContext);
+    const { users, fetchUsers, deleteUser } = useContext(UserContext);
+
+    const isAdmin = user?.rol === "admin";
+    const [query, setQuery] = useState("");
+
+    useEffect(() => {
+        fetchUsers();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const handleEdit = (userData) => {
-        if (user?.rol !== "admin") {
-            showToast({
-                severity: "warn",
-                summary: "Acceso denegado",
-                detail: "Solo los administradores pueden editar usuarios."
-            });
-            return;
-        }
-        navigate(`/user/edit/${userData.id}`, { state: { userData } });
+    // 👇 si no es admin, ocultar inactivos
+    const sourceUsers = useMemo(() => {
+        const list = users || [];
+        return isAdmin ? list : list.filter(u => u?.is_active === true);
+    }, [users, isAdmin]);
+
+    const filteredUsers = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        if (!q) return sourceUsers;
+        return sourceUsers.filter((u) => {
+            const nombre = (u?.nombre ?? "").toLowerCase();
+            const correo = (u?.correo ?? u?.email ?? "").toLowerCase();
+            const rol = (u?.rol ?? "").toLowerCase();
+            return nombre.includes(q) || correo.includes(q) || rol.includes(q);
+        });
+    }, [sourceUsers, query]);
+
+    const handleEdit = (row) => {
+        if (!row?.id) return;
+        navigate(`/user/edit/${row.id}`);
     };
 
-    const handleDelete = async (id) => {
-        if (user?.rol !== "admin") {
-            showToast({
-                severity: "warn",
-                summary: "Acceso denegado",
-                detail: "Solo los administradores pueden eliminar usuarios."
-            });
-            return;
-        }
+    const handleDelete = (row) => {
         confirmDialog({
-            message: "¿Estás seguro de que querés eliminar este usuario?",
+            message: `¿Eliminar al usuario "${row.nombre ?? row.correo}"?`,
             header: "Confirmar eliminación",
             icon: "pi pi-exclamation-triangle",
+            acceptLabel: "Sí, eliminar",
+            rejectLabel: "Cancelar",
+            acceptClassName: "p-button-danger",
             accept: async () => {
-                setLoading(true);
-                const { ok, message } = await deleteUser(id);
-                showToast({
-                    severity: ok ? "success" : "error",
-                    summary: ok ? "Éxito" : "Error",
-                    detail: message
-                });
-                setLoading(false);
+                const res = await deleteUser(row.id);
+                if (res?.ok) {
+                    showToast({
+                        severity: "success",
+                        summary: "Eliminado",
+                        detail: res?.message || "Usuario eliminado.",
+                        life: 1600,
+                    });
+                    fetchUsers();
+                } else {
+                    showToast({
+                        severity: "error",
+                        summary: "Error",
+                        detail: res?.message || "No se pudo eliminar el usuario.",
+                        life: 2400,
+                    });
+                }
             },
-            reject: () => {}
         });
     };
 
-    const actionBodyTemplate = (rowData) => {
-        // Solo admin puede ver las acciones de editar y eliminar
-        if (user?.rol !== "admin") {
-            return null;
-        }
-        
+    if (status === AUTH_TYPE.UNAUTH) {
         return (
-            <div style={{ display: "flex", gap: "0.5rem" }}>
-                <Button
-                    icon="pi pi-pencil"
-                    className="p-button-rounded p-button-sm"
-                    onClick={() => handleEdit(rowData)}
-                    tooltip="Editar"
-                    tooltipOptions={{ position: "top" }}
-                    style={{
-                        backgroundColor: "#6B7280",
-                        borderColor: "#6B7280"
-                    }}
-                />
-                <Button
-                    icon="pi pi-trash"
-                    className="p-button-rounded p-button-sm"
-                    onClick={() => handleDelete(rowData.id)}
-                    tooltip="Eliminar"
-                    tooltipOptions={{ position: "top" }}
-                    style={{
-                        backgroundColor: "#DC2626",
-                        borderColor: "#DC2626"
-                    }}
-                />
+            <div style={{ minHeight: "100vh", display: "grid", placeItems: "center" }}>
+                <Card style={{ width: 420, textAlign: "center" }}>
+                    <h3 style={{ marginTop: 0, marginBottom: 8 }}>No autorizado</h3>
+                    <p style={{ marginTop: 0 }}>Debes iniciar sesión para ver los usuarios.</p>
+                    <Button
+                        label="Ir al login"
+                        icon="pi pi-sign-in"
+                        onClick={() => navigate("/auth/login")}
+                        className="p-button-primary"
+                    />
+                </Card>
             </div>
         );
-    };
-
-    const rolBodyTemplate = (rowData) => {
-        const getRolSeverity = (rol) => {
-            const rolLower = rol?.toLowerCase();
-            if (rolLower === "admin") return "danger";
-            if (rolLower === "empleado") return "info";
-            if (rolLower === "cliente") return "success";
-            return null;
-        };
-
-        return <Tag value={rowData.rol} severity={getRolSeverity(rowData.rol)} />;
-    };
+    }
 
     return (
-        <div className="user-list-container">
-            <Card className="user-list-card">
-                <div className="user-list-header">
+        <div style={{ minHeight: "100vh", display: "grid", placeItems: "center", padding: 16 }}>
+            <Card style={{ width: 1000, maxWidth: "95vw" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
-                        <h1 className="user-list-title">
-                            Lista de Usuarios
-                        </h1>
-                        <p className="user-list-subtitle">
-                            {user?.rol === "admin" 
-                                ? "Gestiona todos los usuarios del sistema" 
-                                : "Lista de usuarios del sistema"}
-                        </p>
+                        <h2 style={{ marginTop: 0, marginBottom: 6 }}>Usuarios</h2>
+                        <p style={{ marginTop: 0, color: "#666" }}>Listado de usuarios del sistema</p>
                     </div>
-                    {user?.rol === "admin" && (
-                        <Button 
-                            label="Registrar Usuario" 
-                            icon="pi pi-user-plus" 
-                            className="p-button-primary"
-                            onClick={() => navigate("/user/register")}
-                            style={{ marginTop: "0.5rem" }}
-                        />
-                    )}
+                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        <span className="p-input-icon-left">
+
+                            <InputText
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                placeholder="Buscar por nombre, correo o rol"
+                                style={{ width: 280 }}
+                            />
+                        </span>
+                        {isAdmin && (
+                            <Button
+                                label="Nuevo"
+                                icon="pi pi-user-plus"
+                                onClick={() => navigate("/user/register")}
+                            />
+                        )}
+                    </div>
                 </div>
 
-                <DataTable
-                    value={users}
-                    loading={loading}
-                    paginator
-                    rows={10}
-                    rowsPerPageOptions={[5, 10, 25, 50]}
-                    emptyMessage="No hay usuarios disponibles"
-                    style={{ marginTop: "1rem" }}
-                    stripedRows
-                    showGridlines
-                    responsiveLayout="scroll"
-                >
-                    <Column 
-                        field="id" 
-                        header="ID" 
-                        sortable 
-                        style={{ width: "80px" }}
-                    />
-                    <Column 
-                        field="nombre" 
-                        header="Nombre" 
-                        sortable
-                        style={{ minWidth: "150px" }}
-                    />
-                    <Column 
-                        field="correo" 
-                        header="Correo" 
-                        sortable
-                        style={{ minWidth: "200px" }}
-                    />
-                    <Column 
-                        field="rol" 
-                        header="Rol" 
-                        body={rolBodyTemplate}
-                        sortable
-                        style={{ minWidth: "120px" }}
-                    />
-                    <Column 
-                        header="Acciones" 
-                        body={actionBodyTemplate}
-                        style={{ width: "120px", textAlign: "center" }}
-                    />
-                </DataTable>
-                <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "flex-end" }}>
-                    <Button 
-                        type="button" 
-                        label="Volver" 
-                        icon="pi pi-arrow-left" 
-                        className="p-button-text p-button-sm" 
-                        onClick={() => navigate(-1)}
-                    />
+                <div style={{ marginTop: 8 }}>
+                    <DataTable
+                        value={filteredUsers}
+                        paginator
+                        rows={10}
+                        emptyMessage="No hay usuarios para mostrar."
+                        stripedRows
+                        responsiveLayout="scroll"
+                    >
+                        <Column
+                            header="#"
+                            body={(_, { rowIndex }) => rowIndex + 1}
+                            style={{ width: 60, textAlign: "center" }}
+                        />
+                        <Column field="nombre" header="Nombre" sortable style={{ minWidth: 160 }} />
+                        <Column
+                            header="Correo"
+                            body={(row) => row?.correo || row?.email || "-"}
+                            sortable
+                            style={{ minWidth: 220 }}
+                        />
+                        {isAdmin && (
+                            <>
+                                <Column field="rol" header="Rol" sortable style={{ width: 140 }} />
+                                <Column
+                                    header="Estado"
+                                    body={(row) => (
+                                        <Tag
+                                            value={row?.is_active ? "Activo" : "Inactivo"}
+                                            severity={row?.is_active ? "success" : "danger"}
+                                        />
+                                    )}
+                                    style={{ width: 140, textAlign: "center" }}
+                                />
+                            </>
+                        )}
+                        <Column
+                            header="Acciones"
+                            body={(row) => (
+                                <div style={{ display: "flex", gap: 8 }}>
+                                    <Button
+                                        icon="pi pi-pencil"
+                                        className="p-button-sm p-button-rounded p-button-text"
+                                        onClick={() => handleEdit(row)}
+                                        aria-label="Editar"
+                                        tooltip="Editar"
+                                    />
+                                    {isAdmin && row?.id !== user?.id && (
+                                        <Button
+                                            icon="pi pi-trash"
+                                            className="p-button-sm p-button-rounded p-button-text p-button-danger"
+                                            onClick={() => handleDelete(row)}
+                                            aria-label="Borrar"
+                                            tooltip="Borrar"
+                                        />
+                                    )}
+                                </div>
+                            )}
+                            style={{ width: 160 }}
+                        />
+                    </DataTable>
                 </div>
             </Card>
+
             <ConfirmDialog />
         </div>
     );

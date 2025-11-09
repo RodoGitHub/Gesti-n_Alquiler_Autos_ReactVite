@@ -8,14 +8,14 @@ import { ClientProvider } from "./contexts/ClientContext";
 
 import AuthRoutes from "./pages/auth";
 import UserRoutes from "./pages/user";
-import HomeRoutes from "./pages/home"; 
-import ClientRoutes from "./pages/client";
+//import HomeRoutes from "./pages/home"; 
+//import ClientRoutes from "./pages/client";
 
 function App() {
     return (
         <Fragment>
             <Routes>
-                <Route path="/*" element={<HomeRoutes />} />
+                
                 <Route 
                     path="/auth/*" 
                     element={
@@ -31,15 +31,7 @@ function App() {
                     }
                 />
 
-                {/* Rutas privadas */}
-                <Route
-                    path="/client/*"
-                    element={
-                        <ClientProvider>
-                            <ClientRoutes />
-                        </ClientProvider>
-                    }
-                />
+                
             </Routes>
         </Fragment>
     );

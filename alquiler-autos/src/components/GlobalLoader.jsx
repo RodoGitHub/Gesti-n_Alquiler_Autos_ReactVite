@@ -4,7 +4,9 @@ import { ProgressSpinner } from "primereact/progressspinner";
 
 export default function GlobalLoader() {
   const [visible, setVisible] = useState(false);
+
   useEffect(() => onLoadingChange(setVisible), []);
+  
   if (!visible) return null;
 
   return (

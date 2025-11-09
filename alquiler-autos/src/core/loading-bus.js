@@ -13,6 +13,7 @@ export function stopLoading()  {
 
 export function onLoadingChange(fn) { 
   listeners.add(fn); 
+  fn(active > 0);
   return () => listeners.delete(fn); 
 }
 

@@ -1,33 +1,32 @@
 import { useContext } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext"; // ojo la ruta
+import { AuthContext } from "../contexts/AuthContext";
+import { AUTH_TYPE } from "../constants/authType";
 
-/**
- * Protege rutas por rol.
- * - Si no hay sesión -> redirige a /inicio-sesion guardando "from"
- * - Si hay sesión pero no tiene rol requerido -> redirige a /
- */
 export function RequireRole({ roles = [], children }) {
-  const { user, loading } = useContext(AuthContext); 
-  const location = useLocation();
+    const { user, status } = useContext(AuthContext);
+    const location = useLocation();
+    const LOGIN_PATH = "/auth/login";
 
-  const LOGIN_PATH = "/auth/login";
+    if (status === AUTH_TYPE.LOADING) {
+        return null;
+    }
 
-  if (loading) return null; // o un spinner
+    // Sin sesión: redirigir a login
+    if (status === AUTH_TYPE.UNAUTH || !user) {
+        return (
+            <Navigate
+                to={LOGIN_PATH}
+                replace
+                state={{ from: location.pathname + location.search }}
+            />
+        );
+    }
 
-  if (!user) {
-    return (
-      <Navigate
-        to= {LOGIN_PATH}
-        replace
-        state={{ from: location.pathname + location.search }}
-      />
-    );
-  }
+    // Con sesión pero sin rol permitido
+    if (roles.length && !roles.includes(user.rol)) {
+        return <Navigate to="/" replace />;
+    }
 
-  if (roles.length && !roles.includes(user.rol)) {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
+    return children;
 }
