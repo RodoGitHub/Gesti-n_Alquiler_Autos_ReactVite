@@ -148,44 +148,34 @@ export default function UserList() {
                         />
 
                         {isAdmin && (
-                            <Column field="rol" header="Rol" sortable style={{ width: 140 }} />
-                        )}
+                            <>
+                                <Column field="rol" header="Rol" sortable style={{ width: 140 }} />
 
-                        <Column
-                            header="Estado"
-                            body={(row) => (
-                                <Tag
-                                    value={row?.is_active ? "Activo" : "Inactivo"}
-                                    severity={row?.is_active ? "success" : "danger"}
-                                />
-                            )}
-                            style={{ width: 140, textAlign: "center" }}
-                        />
+                                <Column
+                                    header="Acciones"
+                                    body={(row) => (
+                                        <div style={{ display: "flex", gap: 8 }}>
+                                            <Button
+                                                icon="pi pi-pencil"
+                                                className="p-button-sm p-button-rounded p-button-text"
+                                                onClick={() => handleEdit(row)}
+                                                aria-label="Editar"
+                                                tooltip="Editar"
+                                            />
 
-                        <Column
-                            header="Acciones"
-                            body={(row) => (
-                                <div style={{ display: "flex", gap: 8 }}>
-                                    <Button
-                                        icon="pi pi-pencil"
-                                        className="p-button-sm p-button-rounded p-button-text"
-                                        onClick={() => handleEdit(row)}
-                                        aria-label="Editar"
-                                        tooltip="Editar"
-                                    />
-                                    {isAdmin && row?.id !== user?.id && (
-                                        <Button
-                                            icon="pi pi-trash"
-                                            className="p-button-sm p-button-rounded p-button-text p-button-danger"
-                                            onClick={() => handleDelete(row)}
-                                            aria-label="Borrar"
-                                            tooltip="Borrar"
-                                        />
+                                            <Button
+                                                icon="pi pi-trash"
+                                                className="p-button-sm p-button-rounded p-button-text p-button-danger"
+                                                onClick={() => handleDelete(row)}
+                                                aria-label="Borrar"
+                                                tooltip="Borrar"
+                                            />
+                                        </div>
                                     )}
-                                </div>
-                            )}
-                            style={{ width: 160 }}
-                        />
+                                    style={{ width: 160 }}
+                                />
+                            </>
+                        )}
                     </DataTable>
 
                 </div>

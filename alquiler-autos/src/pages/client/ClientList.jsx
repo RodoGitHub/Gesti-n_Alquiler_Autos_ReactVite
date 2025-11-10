@@ -5,10 +5,8 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Tag } from "primereact/tag";
 import { Toast } from "primereact/toast";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
-import { InputSwitch } from "primereact/inputswitch";
 
 import { ClientContext } from "../../contexts/ClientContext";
 
@@ -74,15 +72,6 @@ export default function ClientList() {
                     detail: message || (ok ? "Cliente eliminado." : "No se pudo eliminar.")
                 });
             }
-        });
-    };
-
-    const onToggleActive = async (row, value) => {
-        const { ok, message } = await editClient(row.id, { ...row, is_active: value });
-        toast.current?.show({
-            severity: ok ? "success" : "error",
-            summary: ok ? "OK" : "Error",
-            detail: ok ? "Estado actualizado" : (message || "No se pudo actualizar el estado.")
         });
     };
 
@@ -165,30 +154,13 @@ export default function ClientList() {
                         />
 
                         <Column
-                            header="Estado"
-                            body={(row) => (
-                                <div className="flex align-items-center gap-2">
-                                    <Tag
-                                        value={row?.is_active ? "Activo" : "Inactivo"}
-                                        severity={row?.is_active ? "success" : "danger"}
-                                    />
-                                    <InputSwitch
-                                        checked={!!row?.is_active}
-                                        onChange={(e) => onToggleActive(row, e.value)}
-                                    />
-                                </div>
-                            )}
-                            style={{ width: 200 }}
-                        />
-
-                        <Column
                             header="Acciones"
                             body={(row) => (
                                 <div style={{ display: "flex", gap: 8 }}>
                                     <Button
                                         icon="pi pi-pencil"
                                         className="p-button-sm p-button-rounded p-button-text"
-                                        onClick={() => navigate(`/client/${row.id}/edit`)}
+                                        onClick={() => navigate(`/client/edit/${row.id}`)}
                                         aria-label="Editar"
                                         tooltip="Editar"
                                     />

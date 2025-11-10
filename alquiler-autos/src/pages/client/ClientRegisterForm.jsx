@@ -184,14 +184,6 @@ export default function ClientForm() {
                                 <small className="p-error"><ErrorMessage name="telefono" /></small>
                             </div>
 
-                            <div className="p-field" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                                <InputSwitch
-                                    checked={values.is_active}
-                                    onChange={(e) => setFieldValue("is_active", e.value)}
-                                />
-                                <span>{values.is_active ? "Activo" : "Inactivo"}</span>
-                            </div>
-
                             <Button
                                 type="submit"
                                 label={isEdit ? "Actualizar" : "Registrar"}

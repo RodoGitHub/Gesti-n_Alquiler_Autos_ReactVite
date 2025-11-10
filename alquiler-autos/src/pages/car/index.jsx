@@ -1,16 +1,17 @@
 import { Routes, Route } from "react-router-dom";
 import { RequireRole } from "../../utils/RequireRole";
-import ClientRegisterForm from "./ClientRegisterForm";
-import ClientList from "./ClientList";
+import CarList from "./CarList";
+import CarRegisterForm from "./CarRegisterForm";
 
-const ClientRoutes = () => {
+
+const CarRoutes = () => {
     return (
         <Routes>
             <Route
                 path="register"
                 element={
                     <RequireRole roles={["admin", "empleado"]}>
-                        <ClientRegisterForm />
+                        <CarRegisterForm />
                     </RequireRole>
                 }
             />
@@ -18,18 +19,18 @@ const ClientRoutes = () => {
                 path="edit/:id"
                 element={
                     <RequireRole roles={["admin", "empleado"]}>
-                        <ClientRegisterForm />
+                        <CarRegisterForm />
                     </RequireRole>
                 }
             />
             <Route
                 path="list"
                 element={
-                    <ClientList />
+                    <CarList />
                 }
             />
         </Routes>
     );
 };
 
-export default ClientRoutes;
+export default CarRoutes;

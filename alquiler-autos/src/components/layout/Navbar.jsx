@@ -10,7 +10,7 @@ const routes = {
     home: "/",
     client: "/client/list",
     user: "/user/list",
-    vehicles: "/vehicles",
+    vehicles: "/car/list",
     rental: "/rental",
     about: "/about",
     login: "/auth/login",

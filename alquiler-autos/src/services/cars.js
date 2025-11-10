@@ -1,7 +1,3 @@
-import { resource } from "./resource";
+import { resource } from "./api";
 
-export const carsService = resource("cars", "Auto");
-
-// Ejemplos:
-// carsService.list({ params: { page: 1, brand: "Ford" } });
-// carsService.create({ plate: "ABC123", model: "Fiesta" });
+export const carService = resource("car", "Auto");
