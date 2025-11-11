@@ -9,7 +9,6 @@ export const api = axios.create({
 
 
 api.interceptors.request.use((config) => {
-    // Solo activar loading global si no se especifica skipGlobalLoading
     if (!config.skipGlobalLoading) {
         startLoading();
     }
@@ -20,14 +19,13 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (res) => { 
-    // Solo detener loading global si no se especificó skipGlobalLoading
     if (!res.config?.skipGlobalLoading) {
         stopLoading(); 
     }
     return res; 
   },
   (error) => {
-    // Solo detener loading global si no se especificó skipGlobalLoading
+    
     if (!error.config?.skipGlobalLoading) {
         stopLoading();
     }

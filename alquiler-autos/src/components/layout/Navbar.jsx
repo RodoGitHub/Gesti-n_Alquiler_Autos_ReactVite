@@ -11,7 +11,7 @@ const routes = {
     client: "/client/list",
     user: "/user/list",
     vehicles: "/car/list",
-    rental: "/rental",
+    rental: "/rental/list",
     about: "/about",
     login: "/auth/login",
 };
@@ -46,19 +46,7 @@ export default function AppNavbar() {
         { label: "Clientes", icon: "pi pi-users", command: () => navigate(routes.client), className: isActive(routes.client) },
         { label: "Usuarios", icon: "pi pi-user", command: () => navigate(routes.user), className: isActive(routes.user) },
         { label: "Vehículos", icon: "pi pi-car", command: () => navigate(routes.vehicles), className: isActive(routes.vehicles) },
-        {
-            label: "Alquiler",
-            icon: "pi pi-calendar",
-            command: () => navigate(routes.rental),
-            className: isActive(routes.rental),
-            template: (item, options) => (
-            <a className={options.className + " flex align-items-center gap-2"} onClick={(e) => options.onClick(e)}>
-                <i className={item.icon} />
-                <span>{item.label}</span>
-                <Badge value="Nuevo" className="ml-2" />
-            </a>
-            ),
-        },
+        { label: "Alquiler", icon: "pi pi-calendar", command: () => navigate(routes.rental), className: isActive(routes.rental) },
         { label: "Sobre nosotros", icon: "pi pi-info-circle", command: () => navigate(routes.about), className: isActive(routes.about) },
         ],
         [pathname]

@@ -12,43 +12,30 @@ import { InputSwitch } from "primereact/inputswitch";
 
 import { useToast } from "../../contexts/ToastContext";
 import { AuthContext } from "../../contexts/AuthContext";
-import { carService } from "../../services/cars";
-import { BrandContext } from "../../contexts/BrandsContext";
+import { CarContext } from "../../contexts/CarsContext";
 
 export default function CarList() {
     const navigate = useNavigate();
     const { showToast } = useToast();
     const { user } = useContext(AuthContext);
+    const { cars, fetchCars, editCar, deleteCar} = useContext(CarContext);
 
-
-    const brandCtx = useContext(BrandContext);
-
-    const [cars, setCars] = useState([]);
     const [query, setQuery] = useState("");
-    const [loading, setLoading] = useState(false);
     const toast = useRef(null);
 
-    const fetchCars = async () => {
-        setLoading(true);
-        try {
-            const res = await carService.list(); 
-            const data = res?.data?.data ?? res?.data ?? [];
-            setCars(Array.isArray(data) ? data : []);
-        } catch (err) {
-            toast.current?.show({
-                severity: "error",
-                summary: "Error",
-                detail: err?.response?.data?.message || err?.message || "No se pudieron obtener los autos."
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
+    const isAdmin = useMemo(
+        () => (user?.rol ?? "").toString().trim().toLowerCase() === "admin",
+        [user?.rol]
+    );
+
+    const isEmpleado = useMemo(
+        () => (user?.rol ?? "").toString().trim().toLowerCase() === "empleado",
+        [user?.rol]
+    );
+
 
     useEffect(() => {
         fetchCars();
-        // opcional: cargar marcas si usás BrandContext
-        brandCtx?.fetchBrands?.();
     }, []);
 
     const filteredCars = useMemo(() => {
@@ -68,6 +55,11 @@ export default function CarList() {
         });
     }, [cars, query]);
 
+    const handleEdit = (row) => {
+        if (!row?.id) return;
+        navigate(`/car/edit/${row.id}`);
+    };
+
     const handleDelete = (row) => {
         confirmDialog({
             message: `¿Eliminar el auto "${row.Brand?.nombre} ${row.modelo} (${row.anio})"?`,
@@ -78,7 +70,7 @@ export default function CarList() {
             acceptClassName: "p-button-danger",
             accept: async () => {
                 try {
-                    const res = await carService.delete(row.id); // DELETE /car/:id
+                    const res = await deleteCar(row.id);
                     showToast({
                         severity: "success",
                         summary: "Eliminado",
@@ -100,8 +92,7 @@ export default function CarList() {
 
     const handleToggleDisponible = async (row, value) => {
         try {
-            // PATCH si tenés, sino PUT parcial
-            const res = await carService.update(row.id, { disponible: value });
+            const res = await editCar(row.id, { disponible: value });
             showToast({
                 severity: "success",
                 summary: "OK",
@@ -119,6 +110,26 @@ export default function CarList() {
         }
     };
 
+    const actionsBody = (row) => {
+        if (!isAdmin) return null;
+        return (
+            <div style={{ display: "flex", gap: 8 }}>
+                <Button
+                    icon="pi pi-pencil"
+                    className="p-button-sm p-button-rounded p-button-text"
+                    onClick={() => handleEdit(row)}
+                    tooltip="Editar"
+                />
+                <Button
+                    icon="pi pi-trash"
+                    className="p-button-sm p-button-rounded p-button-text p-button-danger"
+                    onClick={() => handleDelete(row)}
+                    tooltip="Borrar"
+                />
+            </div>
+        );
+    };
+
     return (
         <div style={{ minHeight: "90vh", display: "grid", placeItems: "center", padding: 16 }}>
             <Toast ref={toast} />
@@ -129,28 +140,35 @@ export default function CarList() {
                         <p style={{ marginTop: 0, color: "#666" }}>Listado de vehículos disponibles en el sistema</p>
                     </div>
 
-                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                        <span className="p-input-icon-left">
-                            <i className="pi pi-search" />
-                            <InputText
-                                value={query}
-                                onChange={(e) => setQuery(e.target.value)}
-                                placeholder="Buscar por marca, modelo, año o precio"
-                                style={{ width: 320 }}
+                    {isAdmin && (
+                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                            <span className="p-input-icon-left">
+                                <InputText
+                                    value={query}
+                                    onChange={(e) => setQuery(e.target.value)}
+                                    placeholder="Buscar por marca, modelo, año o precio"
+                                    style={{ width: 320 }}
+                                />
+                            </span>
+                            <Button
+                                label="Nuevo Auto"
+                                icon="pi pi-plus"
+                                onClick={() => navigate("/car/register")}
                             />
-                        </span>
-                        <Button
-                            label="Nuevo"
-                            icon="pi pi-plus"
-                            onClick={() => navigate("/car/register")}
-                        />
-                    </div>
+                            <Button
+                                label="Nueva Marca"
+                                icon="pi pi-plus"
+                                onClick={() => navigate("/car/brands")}
+                            />
+                        </div>
+                    )}
+                    
                 </div>
 
                 <div style={{ marginTop: 8 }}>
                     <DataTable
+                        key={`users-admin-${isAdmin}`} 
                         value={filteredCars}
-                        loading={loading}
                         paginator
                         rows={10}
                         emptyMessage="No hay autos para mostrar."
@@ -184,45 +202,33 @@ export default function CarList() {
                             style={{ width: 160 }}
                         />
 
-                        <Column
-                            header="Disponibilidad"
-                            body={(row) => (
-                                <div className="flex align-items-center gap-2">
-                                    <Tag
-                                        value={row?.disponible ? "Disponible" : "No disponible"}
-                                        severity={row?.disponible ? "success" : "danger"}
-                                    />
-                                    <InputSwitch
-                                        checked={!!row?.disponible}
-                                        onChange={(e) => handleToggleDisponible(row, e.value)}
-                                    />
-                                </div>
-                            )}
-                            style={{ width: 220 }}
-                        />
+                        {(isAdmin || isEmpleado) && (
+                            <>
+                                <Column
+                                    header="Disponibilidad"
+                                    body={(row) => (
+                                        <div className="flex align-items-center gap-2">
+                                            <Tag
+                                                value={row?.disponible ? "Disponible" : "No disponible"}
+                                                severity={row?.disponible ? "success" : "danger"}
+                                            />
+                                            <InputSwitch
+                                                checked={!!row?.disponible}
+                                                onChange={(e) => handleToggleDisponible(row, e.value)}
+                                            />
+                                        </div>
+                                    )}
+                                    style={{ width: 220 }}
+                                />
 
-                        <Column
-                            header="Acciones"
-                            body={(row) => (
-                                <div style={{ display: "flex", gap: 8 }}>
-                                    <Button
-                                        icon="pi pi-pencil"
-                                        className="p-button-sm p-button-rounded p-button-text"
-                                        onClick={() => navigate(`/car/edit/${row.id}`)}
-                                        aria-label="Editar"
-                                        tooltip="Editar"
-                                    />
-                                    <Button
-                                        icon="pi pi-trash"
-                                        className="p-button-sm p-button-rounded p-button-text p-button-danger"
-                                        onClick={() => handleDelete(row)}
-                                        aria-label="Borrar"
-                                        tooltip="Borrar"
-                                    />
-                                </div>
-                            )}
-                            style={{ width: 160 }}
-                        />
+                                    <Column
+                                    header="Acciones"
+                                    body={actionsBody}
+                                    style={{ width: 160 }}
+                                    hidden={!isAdmin}
+                                />
+                            </>
+                        )}
                     </DataTable>
                 </div>
             </Card>

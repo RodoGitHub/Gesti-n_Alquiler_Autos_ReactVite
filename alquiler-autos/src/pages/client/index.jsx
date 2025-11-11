@@ -25,7 +25,9 @@ const ClientRoutes = () => {
             <Route
                 path="list"
                 element={
-                    <ClientList />
+                    <RequireRole roles={["admin", "empleado"]}>
+                        <ClientList />
+                    </RequireRole>
                 }
             />
         </Routes>

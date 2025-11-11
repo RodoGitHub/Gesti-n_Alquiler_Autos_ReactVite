@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { carService } from "../services/car";
+import { carService } from "../services/cars";
 import { startLoading, stopLoading } from "../core/loading-bus";
 
 export const CarContext = createContext();

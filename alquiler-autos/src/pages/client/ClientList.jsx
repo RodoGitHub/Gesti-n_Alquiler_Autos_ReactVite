@@ -9,10 +9,17 @@ import { Toast } from "primereact/toast";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
 import { ClientContext } from "../../contexts/ClientContext";
+import { AuthContext } from "../../contexts/AuthContext";
 
 export default function ClientList() {
     const navigate = useNavigate();
-    const { clients, fetchClients, deleteClient, editClient } = useContext(ClientContext);
+    const { clients, fetchClients, deleteClient } = useContext(ClientContext);
+    const { user } = useContext(AuthContext);
+
+    const isAdmin = useMemo(
+        () => (user?.rol ?? "").toString().trim().toLowerCase() === "admin",
+        [user?.rol]
+    );
 
     const [query, setQuery] = useState("");
     const [loading, setLoading] = useState(false);
@@ -56,6 +63,11 @@ export default function ClientList() {
         });
     }, [clients, query]);
 
+    const handleEdit = (row) => {
+        if (!row?.id) return;
+        navigate(`/client/edit/${row.id}`);
+    };
+
     const handleDelete = (row) => {
         confirmDialog({
             message: `¿Eliminar a "${row.apellido}, ${row.nombre}"?`,
@@ -73,6 +85,26 @@ export default function ClientList() {
                 });
             }
         });
+    };
+
+    const actionsBody = (row) => {
+        if (!isAdmin) return null;
+        return (
+            <div style={{ display: "flex", gap: 8 }}>
+                <Button
+                    icon="pi pi-pencil"
+                    className="p-button-sm p-button-rounded p-button-text"
+                    onClick={() => handleEdit(row)}
+                    tooltip="Editar"
+                />
+                <Button
+                    icon="pi pi-trash"
+                    className="p-button-sm p-button-rounded p-button-text p-button-danger"
+                    onClick={() => handleDelete(row)}
+                    tooltip="Borrar"
+                />
+            </div>
+        );
     };
 
     return (
@@ -105,6 +137,7 @@ export default function ClientList() {
 
                 <div style={{ marginTop: 8 }}>
                     <DataTable
+                        key={`users-admin-${isAdmin}`} 
                         value={filteredClients}
                         loading={loading}
                         paginator
@@ -155,25 +188,9 @@ export default function ClientList() {
 
                         <Column
                             header="Acciones"
-                            body={(row) => (
-                                <div style={{ display: "flex", gap: 8 }}>
-                                    <Button
-                                        icon="pi pi-pencil"
-                                        className="p-button-sm p-button-rounded p-button-text"
-                                        onClick={() => navigate(`/client/edit/${row.id}`)}
-                                        aria-label="Editar"
-                                        tooltip="Editar"
-                                    />
-                                    <Button
-                                        icon="pi pi-trash"
-                                        className="p-button-sm p-button-rounded p-button-text p-button-danger"
-                                        onClick={() => handleDelete(row)}
-                                        aria-label="Borrar"
-                                        tooltip="Borrar"
-                                    />
-                                </div>
-                            )}
+                            body={actionsBody}
                             style={{ width: 160 }}
+                            hidden={!isAdmin}
                         />
                     </DataTable>
                 </div>

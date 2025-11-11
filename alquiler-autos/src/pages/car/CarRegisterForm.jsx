@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -9,10 +9,12 @@ import { InputSwitch } from "primereact/inputswitch";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 
-import { brandService } from "../../services/brands";
-import { carService } from "../../services/cars";
+import { BrandContext } from "../../contexts/BrandsContext";
+import { CarContext } from "../../contexts/CarsContext";
 
 export default function CarRegisterForm() {
+    const { fetchBrands } = useContext(BrandContext);
+    const { getCarById, registerCar, editCar } = useContext(CarContext);
     const navigate = useNavigate();
     const { id } = useParams();
     const isEdit = Boolean(id) && id !== "new";
@@ -20,7 +22,7 @@ export default function CarRegisterForm() {
     const toast = useRef(null);
 
     const [initialValues, setInitialValues] = useState({
-        brandId: "",
+        marcaId: "",
         modelo: "",
         anio: "",
         precio_dia: "",
@@ -31,7 +33,7 @@ export default function CarRegisterForm() {
     const [brands, setBrands] = useState([]);
 
     const schema = Yup.object({
-        brandId: Yup.number().typeError("Seleccioná una marca").required("Marca requerida"),
+        marcaId: Yup.number().typeError("Seleccioná una marca").required("Marca requerida"),
         modelo: Yup.string().required("Modelo requerido"),
         anio: Yup.number().typeError("Año inválido").min(1900, "Mínimo 1900").max(2035, "Máximo 2035").required("Año requerido"),
         precio_dia: Yup.number().typeError("Precio inválido").min(0, "No puede ser negativo").required("Precio requerido"),
@@ -41,7 +43,7 @@ export default function CarRegisterForm() {
 
     const loadBrands = async () => {
         try {
-            const res = await brandService.list(); // GET /brand
+            const res = await fetchBrands();
             const data = res?.data?.data ?? res?.data ?? [];
             const items = Array.isArray(data) ? data : [];
             setBrands(items.map(b => ({ label: b.nombre, value: b.id })));
@@ -56,11 +58,11 @@ export default function CarRegisterForm() {
 
     const loadCar = async (carId) => {
         try {
-            const res = await carService.get(carId); // GET /car/:id
+            const res = await  getCarById(carId); 
             const d = res?.data?.data ?? res?.data;
             if (!d) return;
             setInitialValues({
-                brandId: d.brandId || d.BrandId || d.Brand?.id || "",
+                marcaId: d.marcaId || d.marcaId || d.Brand?.id || "",
                 modelo: d.modelo || "",
                 anio: d.anio ?? "",
                 precio_dia: d.precio_dia ?? "",
@@ -84,16 +86,16 @@ export default function CarRegisterForm() {
     const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
         try {
             const payload = {
-                brandId: Number(values.brandId),
+                marcaId: Number(values.marcaId),
                 modelo: values.modelo.trim(),
                 anio: Number(values.anio),
                 precio_dia: Number(values.precio_dia),
                 disponible: !!values.disponible,
-                ...(isEdit ? { is_active: !!values.is_active } : {}) // por si querés editarlo acá también
+                ...(isEdit ? { is_active: !!values.is_active } : {}) 
             };
 
             if (isEdit) {
-                const res = await carService.update(Number(id), payload); // PUT /car/:id
+                const res = await editCar(Number(id), payload); 
                 toast.current?.show({
                     severity: "success",
                     summary: "Actualizado",
@@ -101,7 +103,7 @@ export default function CarRegisterForm() {
                     life: 1800
                 });
             } else {
-                const res = await carService.create(payload); // POST /car
+                const res = await registerCar(payload); 
                 toast.current?.show({
                     severity: "success",
                     summary: "Creado",
@@ -110,7 +112,7 @@ export default function CarRegisterForm() {
                 });
             }
 
-            navigate("/car", { replace: true });
+            navigate("/car/list", { replace: true });
         } catch (err) {
             const msg = err?.response?.data?.message || err?.message || "Error al guardar";
             toast.current?.show({ severity: "error", summary: "Error", detail: msg, life: 2600 });
@@ -140,16 +142,16 @@ export default function CarRegisterForm() {
                     {({ isSubmitting, touched, errors, values, setFieldValue }) => (
                         <Form className="p-fluid" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                             <div className="p-field">
-                                <label htmlFor="brandId">Marca *</label>
+                                <label htmlFor="marcaId">Marca *</label>
                                 <Dropdown
-                                    id="brandId"
-                                    value={values.brandId}
-                                    onChange={(e) => setFieldValue("brandId", e.value)}
+                                    id="marcaId"
+                                    value={values.marcaId}
+                                    onChange={(e) => setFieldValue("marcaId", e.value)}
                                     options={brands}
                                     placeholder="-- Elegir marca --"
-                                    className={touched.brandId && errors.brandId ? "p-invalid" : ""}
+                                    className={touched.marcaId && errors.marcaId ? "p-invalid" : ""}
                                 />
-                                <small className="p-error"><ErrorMessage name="brandId" /></small>
+                                <small className="p-error"><ErrorMessage name="marcaId" /></small>
                             </div>
 
                             <div className="p-field">
@@ -211,16 +213,6 @@ export default function CarRegisterForm() {
                                 <span>{values.disponible ? "Disponible" : "No disponible"}</span>
                             </div>
 
-                            {isEdit && (
-                                <div className="p-field" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                                    <label style={{ marginRight: 6 }}>Activo</label>
-                                    <InputSwitch
-                                        checked={values.is_active}
-                                        onChange={(e) => setFieldValue("is_active", e.value)}
-                                    />
-                                    <span>{values.is_active ? "Activo" : "Inactivo"}</span>
-                                </div>
-                            )}
 
                             <Button
                                 type="submit"

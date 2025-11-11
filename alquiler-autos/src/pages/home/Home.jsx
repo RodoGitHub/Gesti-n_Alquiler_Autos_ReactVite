@@ -11,15 +11,14 @@ const slides = [
         subtitle: "Autos, SUVs y utilitarios para cada necesidad",
         img: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1600&auto=format&fit=crop",
         ctaLabel: "Ver vehículos",
-        to: "/vehicles"
+        to: "/car/list"
     },
     {
         id: 2,
         title: "Reservá en minutos",
         subtitle: "Proceso simple, claro y sin vueltas",
         img: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=1600&auto=format&fit=crop",
-        ctaLabel: "Alquilar ahora",
-        to: "/rental"
+
     },
     {
         id: 3,
@@ -37,21 +36,21 @@ const infoCards = [
         title: "Cobertura y seguros",
         text: "Agregá aquí info sobre tu cobertura, asistencia y pólizas.",
         img: "https://plus.unsplash.com/premium_photo-1661375337384-b6e1f64d7d3d?fm=jpg&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Y2FyJTIwcHJvdGVjdGlvbnxlbnwwfHwwfHx8MA%3D%3D&ixlib=rb-4.1.0&q=80&w=1200&auto=format&fit=crop",
-        to: "/about"
+
     },
     {
         id: "c2",
         title: "Flota renovada",
         text: "Modelos recientes, mantenimiento al día y variedad de segmentos.",
         img: "https://images.unsplash.com/photo-1630165356623-266076eaceb6?fm=jpg&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2FyJTIwZmxlZXR8ZW58MHx8MHx8fDA%3D&ixlib=rb-4.1.0&q=80&w=1200&auto=format&fit=crop",
-        to: "/vehicles"
+        to: "/car/list"
     },
     {
         id: "c3",
         title: "Beneficios y promos",
         text: "Espacio para promociones, cupones o beneficios por fidelidad.",
         img: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?q=80&w=1200&auto=format&fit=crop",
-        to: "/rental"
+
     }
 ];
 

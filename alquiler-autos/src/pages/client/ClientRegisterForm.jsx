@@ -4,7 +4,6 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Card } from "primereact/card";
 import { InputText } from "primereact/inputtext";
-import { InputSwitch } from "primereact/inputswitch";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 
@@ -69,7 +68,7 @@ export default function ClientForm() {
                     summary: ok ? "Actualizado" : "Error",
                     detail: message || (ok ? "Cliente actualizado." : "No se pudo actualizar.")
                 });
-                if (ok) navigate("/client", { replace: true });
+                if (ok) navigate("/client/list", { replace: true });
                 return;
             }
 
@@ -79,7 +78,7 @@ export default function ClientForm() {
                 summary: ok ? "Registrado" : "Error",
                 detail: message || (ok ? "Cliente registrado." : "No se pudo registrar.")
             });
-            if (ok) navigate("/client", { replace: true });
+            if (ok) navigate("/client/list", { replace: true });
         } finally {
             setSubmitting(false);
         }
